@@ -2,771 +2,727 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="theme-color" content="#e30613" />
 <title>VK2 Urlaubsboard</title>
 <style>
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { margin: 0; padding: 0; -webkit-text-size-adjust: 100%; }
-  #root { min-height: 100vh; }
-  input, select, button { font-family: inherit; }
+  body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    color: #000; background: #eeeeee; padding: 12px;
+  }
+  .wrap { max-width: 1200px; margin: 0 auto; }
+  h1 {
+    font-size: 24px; letter-spacing: -0.5px; margin: 0;
+    display: flex; align-items: center; gap: 10px;
+    text-transform: uppercase; font-weight: 800;
+  }
+  header.top {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+    border-bottom: 4px solid #000; padding-bottom: 10px;
+  }
+  .vk2badge { background: #e30613; color: #fff; font-size: 13px; padding: 4px 10px; font-weight: 800; letter-spacing: 2px; }
+  .tabs { display: flex; gap: 0; background: #fff; border: 2px solid #000; margin-bottom: 14px; }
+  .tab { flex: 1; padding: 10px; border: none; background: transparent; color: #000; font-weight: 700; cursor: pointer; font-size: 14px; letter-spacing: 0.3px; }
+  .tab.active { background: #e30613; color: #fff; }
+  .card { background: #fff; border: 2px solid #000; }
+  .btn { border: none; padding: 11px 16px; font-weight: 700; cursor: pointer; font-size: 15px; background: #e30613; color: #fff; }
+  .btn.black { background: #000; color: #fff; }
+  .btn.ghost { background: #fff; color: #000; border: 2px solid #000; }
+  .btn.sm { padding: 8px 12px; font-size: 14px; font-weight: 600; }
+  .btn.ghost.sm { border: 1px solid #000; }
+  .btn.red-ghost { background: #fff; color: #e30613; border: 1.5px solid #e30613; padding: 8px 12px; font-size: 14px; font-weight: 600; }
+  input, select { font-size: 16px; padding: 10px 12px; border: 1px solid #000; background: #fff; outline: none; }
+  input:focus, select:focus { border-color: #e30613; }
+  .toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+  .yearnav { display: flex; align-items: center; gap: 6px; background: #fff; border: 1px solid #000; padding: 4px; }
+  .yearnav button { border: none; background: transparent; width: 36px; height: 36px; cursor: pointer; font-size: 20px; color: #e30613; }
+  .yearnav .yr { font-weight: 700; min-width: 52px; text-align: center; font-size: 16px; }
+  .viewtoggle { display: flex; gap: 5px; background: #fff; border: 1px solid #000; padding: 4px; }
+  .viewtoggle button { border: none; background: transparent; padding: 8px 14px; font-size: 13px; font-weight: 700; color: #000; cursor: pointer; }
+  .viewtoggle button.active { background: #e30613; color: #fff; }
+  .legend { background: #fff; border: 2px solid #000; padding: 12px 16px; margin-bottom: 14px; }
+  .legend .items { display: flex; gap: 14px 24px; align-items: center; font-size: 12.5px; flex-wrap: wrap; font-weight: 600; line-height: 1.4; }
+  .legend .items span.li { display: inline-flex; align-items: center; gap: 7px; }
+  .chip { width: 18px; height: 18px; display: inline-block; border: 1px solid #000; flex-shrink: 0; }
+  .personbar { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+  .personbar label { font-size: 12px; color: #6b6b6b; font-weight: 700; }
+  .personbar select { flex: 1; min-width: 180px; }
+  .cnt { font-size: 13px; font-weight: 700; padding: 5px 12px; }
+  .monthgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; padding: 14px; }
+  .month { border: 1px solid #000; padding: 12px; }
+  .month h4 { font-size: 15px; margin: 0 0 10px; text-align: center; }
+  .dow { display: grid; grid-template-columns: repeat(7,1fr); gap: 3px; margin-bottom: 4px; }
+  .dow span { text-align: center; font-size: 11px; color: #6b6b6b; font-weight: 700; padding: 2px 0; }
+  .days { display: grid; grid-template-columns: repeat(7,1fr); gap: 3px; }
+  .day { aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; user-select: none; position: relative; border: 1px solid #000; font-weight: 500; background: #fff; }
+  .day.empty { border: none; cursor: default; background: transparent; }
+  .day .rep { position: absolute; top: 1px; right: 2px; font-size: 9px; font-weight: 900; line-height: 1; }
+  .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table.cal { border-collapse: collapse; width: 100%; font-size: 11px; }
+  table.cal th, table.cal td { border: 1px solid #000; text-align: center; padding: 0; }
+  table.cal th.nameh { position: sticky; left: 0; z-index: 3; background: #fff; text-align: left; padding: 8px 10px; min-width: 150px; font-size: 13px; }
+  table.cal thead th { background: #f2f2f2; padding: 4px 2px; font-weight: 600; color: #6b6b6b; font-size: 10px; }
+  table.cal thead th.mhead { font-size: 12px; color: #fff; background: #000; }
+  table.cal thead th.uhead { position: sticky; left: 150px; z-index: 3; background: #000; color: #fff; font-size: 11px; min-width: 62px; padding: 4px 6px; }
+  table.cal td.name { position: sticky; left: 0; z-index: 2; text-align: left; padding: 6px 10px; font-size: 13px; font-weight: 700; min-width: 150px; white-space: nowrap; }
+  table.cal td.name small { display: block; font-size: 10px; color: #6b6b6b; font-weight: 500; }
+  table.cal td.ucell { position: sticky; left: 150px; z-index: 2; text-align: center; font-size: 13px; font-weight: 700; min-width: 62px; background: #fff; }
+  .daycell { width: 20px; height: 30px; cursor: pointer; }
+  .emprow { display: flex; align-items: center; gap: 8px; padding: 11px 10px; flex-wrap: wrap; border-bottom: 1px solid #000; }
+  .emprow .nm { font-weight: 700; min-width: 120px; }
+  .badge { font-size: 11px; padding: 2px 8px; font-weight: 700; }
+  .badge.me { background: #e30613; color: #fff; letter-spacing: 0.5px; }
+  .badge.fach { color: #fff; }
+  .badge.outline { background: #fff; color: #000; border: 1.5px solid #000; padding: 1px 8px; }
+  .badge.grey { background: #e0e0e0; color: #000; }
+  .badge.black { background: #000; color: #fff; }
+  .spacer { flex: 1; }
+  .bdaygrid { display: grid; grid-template-columns: repeat(auto-fill,minmax(240px,1fr)); gap: 10px; padding: 16px; }
+  .bcard { border: 1.5px solid #000; padding: 14px; display: flex; align-items: center; gap: 12px; background: #fff; }
+  .bcard.soon { border: 3px solid #e30613; background: #f7c6c9; }
+  .bcard .cake { font-size: 26px; }
+  .bcard .bn { font-weight: 700; }
+  .bcard .bd { color: #6b6b6b; font-size: 13px; }
+  .sub { color: #6b6b6b; font-size: 13px; margin: 2px 0 14px; }
+  .hint { font-size: 12px; color: #6b6b6b; margin-top: 10px; line-height: 1.5; }
+  .empty { color: #6b6b6b; padding: 24px; text-align: center; line-height: 1.6; }
+  .modal-bg { position: fixed; inset: 0; background: rgba(15,23,42,0.45); display: flex; align-items: center; justify-content: center; z-index: 50; padding: 16px; }
+  .modal { background: #fff; padding: 22px; width: 100%; max-width: 380px; max-height: 90vh; overflow-y: auto; border: 2px solid #000; }
+  .modal h3 { margin: 0 0 14px; }
+  .modal .fields { display: flex; flex-direction: column; gap: 12px; margin-bottom: 18px; }
+  .modal label.lbl { font-size: 12px; color: #6b6b6b; font-weight: 700; display: block; margin-bottom: 5px; }
+  .modal .actions { display: flex; gap: 8px; justify-content: flex-end; }
+  .modal .chk { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 10px 12px; border: 1.5px solid #000; background: #fff; }
+  .modal .chk.on { background: #f7c6c9; }
+  .modal .chk input { width: 18px; height: 18px; }
+  .modal input[type=text], .modal input[type=date], .modal select { width: 100%; }
+  .exportbox { margin-top: 24px; border-top: 2px solid #000; padding-top: 16px; }
+  .exportbox h3 { font-size: 15px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 6px; }
+  .exportrow { display: flex; gap: 10px; flex-wrap: wrap; }
+  @media (max-width: 640px) {
+    h1 { font-size: 20px; }
+    .monthgrid { grid-template-columns: 1fr; padding: 12px; gap: 12px; }
+    .day { font-size: 15px; }
+  }
 </style>
-<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </head>
 <body>
-<div id="root"></div>
-<script type="text/babel" data-presets="react">
-const { useState, useEffect, useCallback, useRef } = React;
+<div class="wrap" id="app"></div>
 
-const mk = (id, name, opts = {}) => ({
-  id, name, me: false, birthday: "", urlaub: [],
-  azubi: false, schulkinder: false, pflege: false, teilzeit: false, vollzeit: false, fach: "",
-  ...opts,
-});
+<script>
+"use strict";
 
-const DEFAULT_EMP = [
-  { id: "me", name: "Jennifer Hebling (VK2-Leitung)", me: true, birthday: "", urlaub: [], azubi: false, schulkinder: false, pflege: false, teilzeit: false, vollzeit: true, fach: "" },
-  // Azubis (alphabetisch)
-  mk("e1",  "Amy Lee",                { azubi: true,    fach: "Elektro" }),
-  mk("e3",  "Philipp Warkus",         { azubi: true,    fach: "Sanitär" }),
-  // Eisenwaren
-  mk("e9",  "Christian Beck",         { vollzeit: true, fach: "Eisenwaren" }),
-  mk("e8",  "Ralf Weigel",            { vollzeit: true, fach: "Eisenwaren" }),
-  // Elektro
-  mk("e2",  "Birgit Trüller",         { teilzeit: true, fach: "Elektro" }),
-  mk("e10", "Lin Berisha",            { teilzeit: true, fach: "Elektro" }),
-  mk("e11", "Lisa Freund",            { vollzeit: true, fach: "Elektro" }),
-  mk("e7",  "Marius Kolja Rieger",    { vollzeit: true, fach: "Elektro" }),
-  // Sanitär
-  mk("e5",  "Irene Heilmann",         { vollzeit: true, fach: "Sanitär" }),
-  mk("e6",  "Karin Kuhl",             { teilzeit: true, fach: "Sanitär" }),
-  mk("e4",  "Michael Gössl",          { vollzeit: true, fach: "Sanitär" }),
-  mk("e13", "Monika Peters",          { vollzeit: true, fach: "Sanitär" }),
-  mk("e12", "Stefan Lautenschläger",  { vollzeit: true, fach: "Sanitär" }),
+/* ====================== DATEN ====================== */
+var MONTHS = ["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];
+var MONTHS_FULL = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+var WD = ["S","M","D","M","D","F","S"];
+var WD_MON = ["Mo","Di","Mi","Do","Fr","Sa","So"];
+var URLAUBS_LIMIT = 30;
+
+var FACHBEREICHE = ["Elektro","Eisenwaren","Sanitär"];
+var FACH_FARBE = { "Elektro":"#e30613", "Eisenwaren":"#9e9e9e", "Sanitär":"#000000" };
+var FACH_ROW = {
+  "Elektro":    { line:"#e30613" },
+  "Sanitär":    { line:"#000000" },
+  "Eisenwaren": { line:"#9e9e9e" }
+};
+
+var COL = {
+  accent:"#e30613", ink:"#000000", weekend:"#dcdcdc", ferien:"#f4c400",
+  vorjahr:"#e0e0e0", over:"#e30613", overBg:"#f7c6c9"
+};
+
+/* Ferien Hessen (Quelle: Hess. Kultusministerium) */
+var FERIEN = {
+  2025: [
+    {start:"2025-01-01", end:"2025-01-11"},
+    {start:"2025-04-07", end:"2025-04-21"},
+    {start:"2025-07-07", end:"2025-08-15"},
+    {start:"2025-10-06", end:"2025-10-18"},
+    {start:"2025-12-22", end:"2025-12-31"}
+  ],
+  2026: [
+    {start:"2026-01-01", end:"2026-01-10"},
+    {start:"2026-03-30", end:"2026-04-10"},
+    {start:"2026-06-29", end:"2026-08-07"},
+    {start:"2026-10-05", end:"2026-10-17"},
+    {start:"2026-12-23", end:"2026-12-31"}
+  ],
+  2027: [
+    {start:"2027-01-01", end:"2027-01-12"}
+  ]
+};
+
+/* Gesetzliche Feiertage Hessen (Quelle: Hess. Innenministerium) */
+var FEIERTAGE = {
+  2025: {"2025-01-01":"Neujahr","2025-04-18":"Karfreitag","2025-04-21":"Ostermontag","2025-05-01":"Tag der Arbeit","2025-05-29":"Christi Himmelfahrt","2025-06-09":"Pfingstmontag","2025-06-19":"Fronleichnam","2025-10-03":"Tag der Deutschen Einheit","2025-12-25":"1. Weihnachtsfeiertag","2025-12-26":"2. Weihnachtsfeiertag"},
+  2026: {"2026-01-01":"Neujahr","2026-04-03":"Karfreitag","2026-04-06":"Ostermontag","2026-05-01":"Tag der Arbeit","2026-05-14":"Christi Himmelfahrt","2026-05-25":"Pfingstmontag","2026-06-04":"Fronleichnam","2026-10-03":"Tag der Deutschen Einheit","2026-12-25":"1. Weihnachtsfeiertag","2026-12-26":"2. Weihnachtsfeiertag"},
+  2027: {"2027-01-01":"Neujahr","2027-03-26":"Karfreitag","2027-03-29":"Ostermontag","2027-05-01":"Tag der Arbeit","2027-05-06":"Christi Himmelfahrt","2027-05-17":"Pfingstmontag","2027-05-27":"Fronleichnam","2027-10-03":"Tag der Deutschen Einheit","2027-12-25":"1. Weihnachtsfeiertag","2027-12-26":"2. Weihnachtsfeiertag"}
+};
+
+function mk(id, name, opts) {
+  var e = { id:id, name:name, me:false, birthday:"", urlaub:[], azubi:false, schulkinder:false, pflege:false, teilzeit:false, vollzeit:false, fach:"" };
+  for (var k in opts) e[k] = opts[k];
+  return e;
+}
+var DEFAULT_EMP = [
+  { id:"me", name:"Jennifer Hebling (VK2-Leitung)", me:true, birthday:"", urlaub:[], azubi:false, schulkinder:false, pflege:false, teilzeit:false, vollzeit:true, fach:"" },
+  mk("e1","Amy Lee",{azubi:true, fach:"Elektro"}),
+  mk("e3","Philipp Warkus",{azubi:true, fach:"Sanitär"}),
+  mk("e9","Christian Beck",{vollzeit:true, fach:"Eisenwaren"}),
+  mk("e8","Ralf Weigel",{vollzeit:true, fach:"Eisenwaren"}),
+  mk("e2","Birgit Trüller",{teilzeit:true, fach:"Elektro"}),
+  mk("e10","Lin Berisha",{teilzeit:true, fach:"Elektro"}),
+  mk("e11","Lisa Freund",{vollzeit:true, fach:"Elektro"}),
+  mk("e7","Marius Kolja Rieger",{vollzeit:true, fach:"Elektro"}),
+  mk("e5","Irene Heilmann",{vollzeit:true, fach:"Sanitär"}),
+  mk("e6","Karin Kuhl",{teilzeit:true, fach:"Sanitär"}),
+  mk("e4","Michael Gössl",{vollzeit:true, fach:"Sanitär"}),
+  mk("e13","Monika Peters",{vollzeit:true, fach:"Sanitär"}),
+  mk("e12","Stefan Lautenschläger",{vollzeit:true, fach:"Sanitär"})
 ];
 
-const FACHBEREICHE = ["Elektro", "Eisenwaren", "Sanitär"];
-const FACH_FARBE = { Elektro: "#e30613", Eisenwaren: "#9e9e9e", "Sanitär": "#000000" };
+/* ====================== HILFSFUNKTIONEN ====================== */
+function pad(n){ return (n<10?"0":"")+n; }
+function iso(y,m,d){ return y+"-"+pad(m+1)+"-"+pad(d); }
+function daysInMonth(y,m){ return new Date(y,m+1,0).getDate(); }
+function todayISO(){ var t=new Date(); return iso(t.getFullYear(),t.getMonth(),t.getDate()); }
 
-// Einfärbung der Namensspalte nach Fachbereich (Bauhaus: nur schwarz/rot/grau als Balken)
-const FACH_ROW = {
-  Elektro:    { bg: "#f2f2f2", line: "#e30613" },  // roter Balken
-  "Sanitär":  { bg: "#f2f2f2", line: "#000000" },  // schwarzer Balken
-  Eisenwaren: { bg: "#f2f2f2", line: "#9e9e9e" },  // grauer Balken
-};
-
-// ---- Gesetzliche Feiertage Hessen (Quelle: Hessisches Innenministerium) ----
-const FEIERTAGE = {
-  2025: {
-    "2025-01-01": "Neujahr", "2025-04-18": "Karfreitag", "2025-04-21": "Ostermontag",
-    "2025-05-01": "Tag der Arbeit", "2025-05-29": "Christi Himmelfahrt", "2025-06-09": "Pfingstmontag",
-    "2025-06-19": "Fronleichnam", "2025-10-03": "Tag der Deutschen Einheit",
-    "2025-12-25": "1. Weihnachtsfeiertag", "2025-12-26": "2. Weihnachtsfeiertag",
-  },
-  2026: {
-    "2026-01-01": "Neujahr", "2026-04-03": "Karfreitag", "2026-04-06": "Ostermontag",
-    "2026-05-01": "Tag der Arbeit", "2026-05-14": "Christi Himmelfahrt", "2026-05-25": "Pfingstmontag",
-    "2026-06-04": "Fronleichnam", "2026-10-03": "Tag der Deutschen Einheit",
-    "2026-12-25": "1. Weihnachtsfeiertag", "2026-12-26": "2. Weihnachtsfeiertag",
-  },
-  2027: {
-    "2027-01-01": "Neujahr", "2027-03-26": "Karfreitag", "2027-03-29": "Ostermontag",
-    "2027-05-01": "Tag der Arbeit", "2027-05-06": "Christi Himmelfahrt", "2027-05-17": "Pfingstmontag",
-    "2027-05-27": "Fronleichnam", "2027-10-03": "Tag der Deutschen Einheit",
-    "2027-12-25": "1. Weihnachtsfeiertag", "2027-12-26": "2. Weihnachtsfeiertag",
-  },
-};
-function feiertagName(ds) {
-  const y = parseInt(ds.slice(0, 4));
-  return (FEIERTAGE[y] || {})[ds] || null;
+function ferienDaysSet(year){
+  var set = {};
+  var list = FERIEN[year] || [];
+  for (var i=0;i<list.length;i++){
+    var d = new Date(list[i].start), end = new Date(list[i].end);
+    while (d <= end){ set[iso(d.getFullYear(),d.getMonth(),d.getDate())] = true; d.setDate(d.getDate()+1); }
+  }
+  return set;
 }
-const URLAUBS_LIMIT = 30;
+function feiertagName(ds){
+  var y = parseInt(ds.slice(0,4),10);
+  var f = FEIERTAGE[y] || {};
+  return f[ds] || null;
+}
+function priorYearMMDD(emp, year){
+  var set = {};
+  var u = emp.urlaub || [];
+  for (var i=0;i<u.length;i++){
+    var y = parseInt(u[i].slice(0,4),10);
+    if (y < year) set[u[i].slice(5)] = true;
+  }
+  return set;
+}
+function fmtBday(b){
+  var p = b.split("-");
+  if (p.length===3) return parseInt(p[2],10)+". "+MONTHS_FULL[parseInt(p[1],10)-1];
+  if (p.length===2) return parseInt(p[1],10)+". "+MONTHS_FULL[parseInt(p[0],10)-1];
+  return b;
+}
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 
-// ---- Sichtbeton-/Schalungsbeton-Textur als SVG (Data-URI) ----
-// Schalungsplatten-Raster (240x120) mit Fugen, Ankerlöchern und feinen Brettlinien.
-const BETON_SVG = `<svg xmlns='http://www.w3.org/2000/svg' width='240' height='120' viewBox='0 0 240 120'>
-  <defs>
-    <linearGradient id='pl' x1='0' y1='0' x2='0' y2='1'>
-      <stop offset='0' stop-color='#c9c9c7'/>
-      <stop offset='0.5' stop-color='#c2c2bf'/>
-      <stop offset='1' stop-color='#bcbcb9'/>
-    </linearGradient>
-  </defs>
-  <rect width='240' height='120' fill='url(#pl)'/>
-  <!-- feine vertikale Schalungsbrett-Fugen -->
-  <g stroke='#b0b0ad' stroke-width='0.5' opacity='0.5'>
-    <line x1='40' y1='0' x2='40' y2='120'/>
-    <line x1='80' y1='0' x2='80' y2='120'/>
-    <line x1='160' y1='0' x2='160' y2='120'/>
-    <line x1='200' y1='0' x2='200' y2='120'/>
-  </g>
-  <!-- Plattenfugen (Raster der Schaltafeln) -->
-  <g stroke='#9a9a97' stroke-width='1.1' opacity='0.75'>
-    <line x1='0' y1='60' x2='240' y2='60'/>
-    <line x1='120' y1='0' x2='120' y2='120'/>
-    <line x1='0' y1='0.5' x2='240' y2='0.5'/>
-    <line x1='0.5' y1='0' x2='0.5' y2='120'/>
-  </g>
-  <!-- highlight unter den Fugen für Tiefe -->
-  <g stroke='#d8d8d5' stroke-width='0.6' opacity='0.6'>
-    <line x1='0' y1='61.3' x2='240' y2='61.3'/>
-    <line x1='121.3' y1='0' x2='121.3' y2='120'/>
-  </g>
-  <!-- Ankerlöcher an den Plattenecken/-mitten -->
-  <g>
-    <circle cx='60' cy='30' r='2.4' fill='#8f8f8c'/>
-    <circle cx='60' cy='30' r='1.2' fill='#7c7c79'/>
-    <circle cx='180' cy='30' r='2.4' fill='#8f8f8c'/>
-    <circle cx='180' cy='30' r='1.2' fill='#7c7c79'/>
-    <circle cx='60' cy='90' r='2.4' fill='#8f8f8c'/>
-    <circle cx='60' cy='90' r='1.2' fill='#7c7c79'/>
-    <circle cx='180' cy='90' r='2.4' fill='#8f8f8c'/>
-    <circle cx='180' cy='90' r='1.2' fill='#7c7c79'/>
-    <circle cx='120' cy='60' r='2.6' fill='#8a8a87'/>
-    <circle cx='120' cy='60' r='1.3' fill='#767673'/>
-  </g>
-  <!-- dezente Wolkigkeit / Lunker -->
-  <g opacity='0.35'>
-    <ellipse cx='30' cy='20' rx='26' ry='14' fill='#d2d2cf'/>
-    <ellipse cx='150' cy='45' rx='30' ry='16' fill='#b6b6b3'/>
-    <ellipse cx='95' cy='95' rx='34' ry='15' fill='#d0d0cd'/>
-    <ellipse cx='215' cy='100' rx='22' ry='12' fill='#b8b8b5'/>
-  </g>
-</svg>`;
-const BETON_URI = `url("data:image/svg+xml;utf8,${encodeURIComponent(BETON_SVG)}")`;
-
-// ---------- Storage (localStorage, geräteweit lokal) ----------
-const KEY = "vk2:data";
-function loadData() {
-  try {
-    const raw = localStorage.getItem(KEY);
-    if (raw) return JSON.parse(raw);
-  } catch (e) {}
+/* ====================== SPEICHER (localStorage) ====================== */
+var KEY = "vk2:data";
+function loadData(){
+  try { var raw = localStorage.getItem(KEY); if (raw) return JSON.parse(raw); } catch(e){}
   return null;
 }
-function saveData(data) {
-  try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) {}
+function saveData(){
+  try { localStorage.setItem(KEY, JSON.stringify(STATE.data)); } catch(e){}
 }
-
-// Export als Download-Datei
-function exportToFile(data) {
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  const d = new Date();
-  const stamp = d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
-  a.href = url;
-  a.download = "vk2-urlaubsboard-" + stamp + ".json";
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
+function exportToFile(){
+  var blob = new Blob([JSON.stringify(STATE.data, null, 2)], {type:"application/json"});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement("a");
+  var d = new Date();
+  var stamp = d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+  a.href = url; a.download = "vk2-urlaubsboard-"+stamp+".json";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
 
-// in einem FRÜHEREN Jahr (vor `year`) schon Urlaub hatte.
-function priorYearMMDD(emp, year) {
-  const set = new Set();
-  (emp.urlaub || []).forEach((ds) => {
-    const y = parseInt(ds.slice(0, 4));
-    if (y < year) set.add(ds.slice(5)); // "MM-DD"
-  });
-  return set;
-}
+/* ====================== STATE ====================== */
+var STATE = {
+  data: null,
+  tab: "plan",
+  year: 2026,
+  view: "month",
+  selPerson: "me",
+  editId: null
+};
 
-function fmtBday(b) {
-  const p = b.split("-");
-  if (p.length === 3) return parseInt(p[2]) + ". " + MONTHS_FULL[parseInt(p[1]) - 1];
-  if (p.length === 2) return parseInt(p[1]) + ". " + MONTHS_FULL[parseInt(p[0]) - 1];
-  return b;
-}
-
-function App() {
-  const [data, setData] = useState(null);
-  const [tab, setTab] = useState("plan");
-  const [year, setYear] = useState(2026);
-  const [viewMode, setViewMode] = useState("month");
-  const [selPerson, setSelPerson] = useState("me");
-  const [editEmp, setEditEmp] = useState(null);
-
-  useEffect(() => {
-    (async () => {
-      let d = await loadData();
-      const LAYOUT_VERSION = 4; // erhöhen, wenn DEFAULT_EMP-Reihenfolge/Stammdaten neu gesetzt werden sollen
-      if (!d) {
-        d = { employees: DEFAULT_EMP, layout: LAYOUT_VERSION };
-        await saveData(d);
-      } else {
-        // Einmalige Übernahme: alte Platzhalter ODER veraltete Layout-Version -> Stammdaten & Reihenfolge neu setzen
-        const hatPlatzhalter = d.employees.some((e) => /^Mitarbeiter \d+$/.test(e.name)) ||
-          d.employees.some((e) => e.me && e.name === "Ich (VK2-Leitung)");
-        if (hatPlatzhalter || (d.layout || 0) < LAYOUT_VERSION) {
-          d = { ...d, layout: LAYOUT_VERSION, employees: DEFAULT_EMP.map((def) => {
-            const alt = d.employees.find((e) => e.id === def.id);
-            // Vorhandene Urlaube/Geburtstage behalten, Stammdaten & Reihenfolge neu setzen
-            return alt ? { ...def, urlaub: alt.urlaub || [], birthday: alt.birthday || "" } : def;
-          }) };
-          await saveData(d);
-        }
+function initData(){
+  var d = loadData();
+  var LAYOUT_VERSION = 4;
+  if (!d){
+    d = { employees: DEFAULT_EMP.slice(), layout: LAYOUT_VERSION };
+    STATE.data = d; saveData();
+  } else {
+    var hatPlatzhalter = false, i;
+    for (i=0;i<d.employees.length;i++){
+      if (/^Mitarbeiter \d+$/.test(d.employees[i].name)) hatPlatzhalter = true;
+      if (d.employees[i].me && d.employees[i].name === "Ich (VK2-Leitung)") hatPlatzhalter = true;
+    }
+    if (hatPlatzhalter || (d.layout||0) < LAYOUT_VERSION){
+      var neu = [];
+      for (i=0;i<DEFAULT_EMP.length;i++){
+        var def = DEFAULT_EMP[i], alt = null;
+        for (var j=0;j<d.employees.length;j++){ if (d.employees[j].id === def.id){ alt = d.employees[j]; break; } }
+        if (alt){
+          var copy = {}; for (var k in def) copy[k] = def[k];
+          copy.urlaub = alt.urlaub || []; copy.birthday = alt.birthday || "";
+          neu.push(copy);
+        } else neu.push(def);
       }
-      setData(d);
-    })();
-  }, []);
-
-  const persist = useCallback((nd) => {
-    setData(nd);
-    saveData(nd);
-  }, []);
-
-  if (!data)
-    return <div style={{ padding: 40, textAlign: "center", color: "#000000", fontFamily: "Helvetica, Arial, sans-serif", fontWeight: 700 }}>Lade Urlaubsboard…</div>;
-
-  const ferSet = ferienDaysSet(year);
-  const today = todayISO();
-
-  const toggleDay = (empId, dateStr) => {
-    // Feiertage sind ohnehin frei und nicht als Urlaub buchbar
-    if (feiertagName(dateStr)) return;
-    persist({
-      ...data,
-      employees: data.employees.map((e) => {
-        if (e.id !== empId) return e;
-        const has = e.urlaub.includes(dateStr);
-        return { ...e, urlaub: has ? e.urlaub.filter((x) => x !== dateStr) : [...e.urlaub, dateStr] };
-      }),
-    });
-  };
-
-  const person = data.employees.find((e) => e.id === selPerson) || data.employees[0];
-
-  const C = {
-    bg: "#e8e8e8", card: "#ffffff", ink: "#000000", muted: "#6b6b6b", line: "#000000",
-    accent: "#e30613", accentDark: "#b30410", ferien: "#f4c400", urlaub: "#e30613",
-    urlaubLine: "#000000", weekend: "#dcdcdc", today: "#e30613",
-    repeat: "#000000", repeatBg: "#d4d4d4", vorjahr: "#e0e0e0",
-    feiertag: "#000000", feiertagLine: "#000000", over: "#e30613", overBg: "#f7c6c9",
-    overLine: "#000000", overlapRepeat: "#000000",
-  };
-
-  const tabBtn = (id, label) => (
-    <button
-      onClick={() => setTab(id)}
-      style={{
-        flex: 1, padding: "10px 10px", border: "none", borderRadius: 0, cursor: "pointer",
-        fontSize: 14, fontWeight: 700, whiteSpace: "nowrap", letterSpacing: 0.3,
-        background: tab === id ? C.accent : "transparent",
-        color: tab === id ? "#fff" : C.ink,
-      }}
-    >
-      {label}
-    </button>
-  );
-
-  return (
-    <div style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", color: C.ink, padding: 12, minHeight: "100vh",
-      background: "#eeeeee" }}>
-      <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-        <header style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14, borderBottom: "4px solid #000", paddingBottom: 10 }}>
-          <h1 style={{ fontSize: 24, letterSpacing: "-0.5px", display: "flex", alignItems: "center", gap: 10, margin: 0, textTransform: "uppercase", fontWeight: 800 }}>
-            <span style={{ background: C.accent, color: "#fff", fontSize: 13, padding: "4px 10px", borderRadius: 0, fontWeight: 800, letterSpacing: 2 }}>VK2</span>
-            Urlaubsboard
-          </h1>
-        </header>
-
-        <div style={{ display: "flex", gap: 0, background: C.card, padding: 0, borderRadius: 0, border: `2px solid ${C.line}`, marginBottom: 14 }}>
-          {tabBtn("plan", "Urlaubsplan")}
-          {tabBtn("team", "Mitarbeiter")}
-          {tabBtn("bday", "Geburtstage")}
-        </div>
-
-        {tab === "plan" && (
-          <PlanTab {...{ C, data, year, setYear, viewMode, setViewMode, selPerson, setSelPerson, person, ferSet, today, toggleDay }} />
-        )}
-        {tab === "team" && <TeamTab {...{ C, data, persist, setEditEmp }} />}
-        {tab === "bday" && <Birthdays {...{ C, data }} />}
-
-        {editEmp && (
-          <EditModal
-            C={C}
-            emp={editEmp}
-            onClose={() => setEditEmp(null)}
-            onSave={(upd) => {
-              persist({ ...data, employees: data.employees.map((e) => (e.id === upd.id ? upd : e)) });
-              setEditEmp(null);
-            }}
-          />
-        )}
-      </div>
-    </div>
-  );
+      d.employees = neu; d.layout = LAYOUT_VERSION;
+      STATE.data = d; saveData();
+    } else {
+      STATE.data = d;
+    }
+  }
 }
 
-function Legend({ C }) {
-  const chip = (style) => <span style={{ width: 18, height: 18, borderRadius: 0, display: "inline-block", border: "1px solid #000", flexShrink: 0, ...style }} />;
-  const item = (node, label) => (
-    <span style={{ display: "inline-flex", alignItems: "center", gap: 7 }}>{node}{label}</span>
-  );
-  return (
-    <div style={{ background: "#fff", border: "2px solid #000", padding: "12px 16px", marginBottom: 14 }}>
-      <div style={{ display: "flex", gap: "14px 24px", alignItems: "center", fontSize: 12.5, color: C.ink, flexWrap: "wrap", fontWeight: 600, lineHeight: 1.4 }}>
-        {item(chip({ background: C.accent }), " Urlaub")}
-        {item(chip({ background: "#000000" }), " Feiertag")}
-        {item(chip({ background: C.ferien }), " Ferien Hessen")}
-        {item(chip({ background: C.weekend }), " Wochenende")}
-        {item(chip({ background: C.vorjahr, boxShadow: `inset 0 0 0 3px #000000` }), " wie Vorjahr")}
-        {item(chip({ backgroundImage: `repeating-linear-gradient(45deg, ${C.accent}, ${C.accent} 3px, #000 3px, #000 5px)` }), " Überschneidung")}
-        {item(chip({ backgroundImage: `repeating-linear-gradient(45deg, ${C.accent}, ${C.accent} 3px, #000 3px, #000 5px)`, boxShadow: `inset 0 0 0 3px #000000` }), " Überschn. + Vorjahr")}
-        {item(chip({ background: "#fff", border: `3px solid ${C.accent}` }), " Heute")}
-      </div>
-    </div>
-  );
+/* ====================== AKTIONEN ====================== */
+function toggleDay(empId, ds){
+  if (feiertagName(ds)) return;
+  var emps = STATE.data.employees;
+  for (var i=0;i<emps.length;i++){
+    if (emps[i].id === empId){
+      var idx = emps[i].urlaub.indexOf(ds);
+      if (idx >= 0) emps[i].urlaub.splice(idx,1);
+      else emps[i].urlaub.push(ds);
+      break;
+    }
+  }
+  saveData();
+  render();
+}
+function zaehleUrlaub(emp, year){
+  var n = 0, u = emp.urlaub;
+  for (var i=0;i<u.length;i++){
+    var ds = u[i];
+    if (ds.slice(0,4) !== String(year)) continue;
+    var p = ds.split("-");
+    var dow = new Date(+p[0], +p[1]-1, +p[2]).getDay();
+    if (dow===0 || dow===6) continue;
+    if (feiertagName(ds)) continue;
+    n++;
+  }
+  return n;
 }
 
-function PlanTab({ C, data, year, setYear, viewMode, setViewMode, selPerson, setSelPerson, person, ferSet, today, toggleDay }) {
-  const vtBtn = (id, label) => (
-    <button
-      onClick={() => setViewMode(id)}
-      style={{
-        border: "none", background: viewMode === id ? C.accent : "transparent",
-        color: viewMode === id ? "#fff" : C.ink, padding: "8px 14px", borderRadius: 0,
-        fontSize: 13, fontWeight: 700, cursor: "pointer",
-      }}
-    >
-      {label}
-    </button>
-  );
-  return (
-    <>
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 12 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 6, background: C.card, border: `1px solid ${C.line}`, borderRadius: 0, padding: 4 }}>
-          <button onClick={() => setYear((y) => y - 1)} style={{ border: "none", background: "transparent", width: 36, height: 36, borderRadius: 0, cursor: "pointer", fontSize: 20, color: C.accent }}>‹</button>
-          <span style={{ fontWeight: 700, minWidth: 52, textAlign: "center", fontSize: 16 }}>{year}</span>
-          <button onClick={() => setYear((y) => y + 1)} style={{ border: "none", background: "transparent", width: 36, height: 36, borderRadius: 0, cursor: "pointer", fontSize: 20, color: C.accent }}>›</button>
-        </div>
-        <div style={{ display: "flex", gap: 5, background: C.card, border: `1px solid ${C.line}`, borderRadius: 0, padding: 4 }}>
-          {vtBtn("month", "Monatsansicht")}
-          {vtBtn("table", "Team-Übersicht")}
-        </div>
-      </div>
+/* ====================== RENDER ====================== */
+function render(){
+  var app = document.getElementById("app");
+  var h = "";
+  h += '<header class="top"><h1><span class="vk2badge">VK2</span> Urlaubsboard</h1></header>';
+  h += '<div class="tabs">';
+  h += tabBtn("plan","Urlaubsplan");
+  h += tabBtn("team","Mitarbeiter");
+  h += tabBtn("bday","Geburtstage");
+  h += '</div>';
 
-      <Legend C={C} />
+  if (STATE.tab === "plan") h += renderPlan();
+  else if (STATE.tab === "team") h += renderTeam();
+  else if (STATE.tab === "bday") h += renderBday();
 
-      {viewMode === "month" ? (
-        <>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12, flexWrap: "wrap" }}>
-            <label style={{ fontSize: 12, color: C.muted, fontWeight: 600 }}>Person:</label>
-            <select value={selPerson} onChange={(e) => setSelPerson(e.target.value)} style={{ flex: 1, minWidth: 180, fontSize: 16, padding: "10px 12px", border: `1px solid ${C.line}`, borderRadius: 0 }}>
-              {data.employees.map((e) => (<option key={e.id} value={e.id}>{e.name}</option>))}
-            </select>
-            {(() => {
-              const jahrTage = person.urlaub.filter((d) => d.startsWith(year + "-"));
-              // Nur echte Arbeitstage zählen (kein Wochenende, kein Feiertag)
-              const zaehlbar = jahrTage.filter((d) => {
-                const [Y, M, D] = d.split("-").map(Number);
-                const dow = new Date(Y, M - 1, D).getDay();
-                if (dow === 0 || dow === 6) return false;
-                if (feiertagName(d)) return false;
-                return true;
-              }).length;
-              const rest = URLAUBS_LIMIT - zaehlbar;
-              const over = zaehlbar > URLAUBS_LIMIT;
-              return (
-                <span style={{ fontSize: 13, fontWeight: 700, padding: "5px 12px", borderRadius: 0,
-                  color: over ? "#fff" : rest <= 3 ? C.over : C.ink,
-                  background: over ? C.over : rest <= 3 ? C.overBg : C.weekend }}>
-                  {zaehlbar} / {URLAUBS_LIMIT} Urlaubstage {over ? `· ${zaehlbar - URLAUBS_LIMIT} zu viel!` : `· ${rest} übrig`}
-                </span>
-              );
-            })()}
-            {(() => {
-              const prior = priorYearMMDD(person, year);
-              const rep = person.urlaub.filter((d) => d.startsWith(year + "-") && prior.has(d.slice(5))).length;
-              if (rep === 0) return null;
-              return (
-                <span style={{ fontSize: 13, color: C.repeat, fontWeight: 600, background: C.repeatBg, padding: "4px 10px", borderRadius: 0 }}>
-                  ⚠ {rep} {rep === 1 ? "Tag" : "Tage"} wie im Vorjahr
-                </span>
-              );
-            })()}
-          </div>
-          <div style={{ background: C.card, border: `2px solid ${C.line}`, borderRadius: 0, overflow: "hidden" }}>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 14, padding: 14 }}>
-              {[...Array(12).keys()].map((m) => (
-                <MonthCard key={m} C={C} year={year} month={m} person={person} priorSet={priorYearMMDD(person, year)} ferSet={ferSet} today={today} onToggle={toggleDay} />
-              ))}
-            </div>
-          </div>
-          <p style={{ fontSize: 12, color: C.muted, marginTop: 10, lineHeight: 1.5 }}>
-            Tipp: Tag antippen = Urlaub setzen oder löschen. Oben die Person umschalten. Deine Daten liegen privat auf deinem Account.
-          </p>
-        </>
-      ) : (
-        <>
-          <div style={{ background: C.card, border: `2px solid ${C.line}`, borderRadius: 0, overflow: "auto" }}>
-            <TableView C={C} data={data} year={year} ferSet={ferSet} today={today} onToggle={toggleDay} />
-          </div>
-          <p style={{ fontSize: 12, color: C.muted, marginTop: 10, lineHeight: 1.5 }}>
-            Ganzes Team auf einen Blick. Auf dem Handy seitlich wischen zum Scrollen. Ferien Hessen (Kultusministerium) sind gelb hinterlegt.
-          </p>
-        </>
-      )}
-    </>
-  );
+  app.innerHTML = h;
+  bindEvents();
 }
 
-function MonthCard({ C, year, month, person, priorSet, ferSet, today, onToggle }) {
-  const dim = daysInMonth(year, month);
-  const firstDow = (new Date(year, month, 1).getDay() + 6) % 7;
-  const cells = [];
-  for (let i = 0; i < firstDow; i++) cells.push(null);
-  for (let d = 1; d <= dim; d++) cells.push(d);
-
-  return (
-    <div style={{ border: `1px solid ${C.line}`, borderRadius: 0, padding: 12 }}>
-      <h4 style={{ fontSize: 15, marginBottom: 10, textAlign: "center", margin: "0 0 10px" }}>{MONTHS_FULL[month]}</h4>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 3, marginBottom: 4 }}>
-        {WD_MON.map((w) => (<span key={w} style={{ textAlign: "center", fontSize: 11, color: C.muted, fontWeight: 600, padding: "2px 0" }}>{w}</span>))}
-      </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 3 }}>
-        {cells.map((d, i) => {
-          if (d === null) return <div key={"e" + i} />;
-          const ds = iso(year, month, d);
-          const dow = new Date(year, month, d).getDay();
-          const isWe = dow === 0 || dow === 6;
-          const isFer = ferSet.has(ds);
-          const ftName = feiertagName(ds);
-          const isUrl = person.urlaub.includes(ds);
-          const isRepeat = isUrl && priorSet && priorSet.has(ds.slice(5));
-          const isTod = ds === today;
-          let bg = "#ffffff";
-          if (isWe) bg = C.weekend;
-          if (isFer) bg = C.ferien;
-          if (ftName) bg = "#000000";   // Feiertag = schwarz
-          if (isUrl) bg = C.accent;     // Urlaub = rot
-          if (isRepeat) bg = C.vorjahr; // wie Vorjahr = gelb
-          const style = {
-            aspectRatio: "1/1", display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: 14, borderRadius: 0, cursor: "pointer", userSelect: "none", background: bg,
-            fontWeight: isUrl || ftName ? 800 : 500,
-            color: ftName ? "#ffffff" : isRepeat ? "#000000" : isUrl ? "#ffffff" : isWe && !isFer ? C.muted : C.ink,
-            border: isTod ? `3px solid ${C.accent}` : `1px solid #000000`,
-            boxShadow: isRepeat ? `inset 0 0 0 3px #000000` : "none",
-            backgroundImage: isFer && isUrl && !isRepeat ? `repeating-linear-gradient(45deg, ${C.accent}, ${C.accent} 6px, ${C.ferien} 6px, ${C.ferien} 12px)` : "none",
-            position: "relative",
-          };
-          const tip = ftName ? ftName : isRepeat ? "Selber Tag wie im Vorjahr" : undefined;
-          return (
-            <div key={ds} style={style} onClick={() => onToggle(person.id, ds)} title={tip}>
-              {d}
-              {isRepeat && (
-                <span style={{ position: "absolute", top: 1, right: 2, fontSize: 9, color: "#000000", fontWeight: 900, lineHeight: 1 }}>↻</span>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
+function tabBtn(id,label){
+  return '<button class="tab'+(STATE.tab===id?' active':'')+'" data-tab="'+id+'">'+label+'</button>';
 }
 
-function TableView({ C, data, year, ferSet, today, onToggle }) {
-  const th = { border: `1px solid ${C.line}`, background: "#f2f2f2", padding: "4px 2px", fontWeight: 600, color: C.muted, fontSize: 10, textAlign: "center" };
-  const nameTh = { position: "sticky", left: 0, zIndex: 3, background: C.card, textAlign: "left", padding: "8px 10px", minWidth: 150, fontSize: 13, border: `1px solid ${C.line}` };
+function legendHtml(){
+  function chip(style){ return '<span class="chip" style="'+style+'"></span>'; }
+  var stripe = "background-image:repeating-linear-gradient(45deg,"+COL.accent+","+COL.accent+" 3px,#000 3px,#000 5px);";
+  var h = '<div class="legend"><div class="items">';
+  h += '<span class="li">'+chip("background:"+COL.accent+";")+' Urlaub</span>';
+  h += '<span class="li">'+chip("background:#000;")+' Feiertag</span>';
+  h += '<span class="li">'+chip("background:"+COL.ferien+";")+' Ferien Hessen</span>';
+  h += '<span class="li">'+chip("background:"+COL.weekend+";")+' Wochenende</span>';
+  h += '<span class="li">'+chip("background:"+COL.vorjahr+";box-shadow:inset 0 0 0 3px #000;")+' wie Vorjahr</span>';
+  h += '<span class="li">'+chip(stripe)+' Überschneidung</span>';
+  h += '<span class="li">'+chip(stripe+"box-shadow:inset 0 0 0 3px #000;")+' Überschn. + Vorjahr</span>';
+  h += '<span class="li">'+chip("background:#fff;border:3px solid "+COL.accent+";")+' Heute</span>';
+  h += '</div></div>';
+  return h;
+}
 
-  const zaehleUrlaub = (emp) => emp.urlaub.filter((d) => {
-    if (!d.startsWith(year + "-")) return false;
-    const [Y, M, D] = d.split("-").map(Number);
-    const dow = new Date(Y, M - 1, D).getDay();
-    if (dow === 0 || dow === 6) return false;
-    if (feiertagName(d)) return false;
-    return true;
-  }).length;
+function renderPlan(){
+  var h = "";
+  h += '<div class="toolbar">';
+  h += '<div class="yearnav"><button data-year="-1">‹</button><span class="yr">'+STATE.year+'</span><button data-year="1">›</button></div>';
+  h += '<div class="viewtoggle">';
+  h += '<button class="'+(STATE.view==="month"?"active":"")+'" data-view="month">Monatsansicht</button>';
+  h += '<button class="'+(STATE.view==="table"?"active":"")+'" data-view="table">Team-Übersicht</button>';
+  h += '</div></div>';
+  h += legendHtml();
 
-  // Wie viele Mitarbeiter haben an einem bestimmten Tag Urlaub? -> für Überschneidungen
-  const urlaubProTag = {};
-  data.employees.forEach((emp) => {
-    emp.urlaub.forEach((d) => {
-      if (d.startsWith(year + "-")) urlaubProTag[d] = (urlaubProTag[d] || 0) + 1;
-    });
+  var emps = STATE.data.employees;
+  if (STATE.view === "month"){
+    var person = null;
+    for (var i=0;i<emps.length;i++){ if (emps[i].id===STATE.selPerson){ person = emps[i]; break; } }
+    if (!person) person = emps[0];
+    var used = zaehleUrlaub(person, STATE.year);
+    var rest = URLAUBS_LIMIT - used;
+    var over = used > URLAUBS_LIMIT;
+
+    h += '<div class="personbar"><label>Person:</label><select id="selPerson">';
+    for (var j=0;j<emps.length;j++){
+      h += '<option value="'+emps[j].id+'"'+(emps[j].id===person.id?' selected':'')+'>'+esc(emps[j].name)+'</option>';
+    }
+    h += '</select>';
+    var cntStyle = over ? "background:"+COL.over+";color:#fff;" : (rest<=3 ? "background:"+COL.overBg+";color:"+COL.over+";" : "background:"+COL.weekend+";color:#000;");
+    h += '<span class="cnt" style="'+cntStyle+'">'+used+' / '+URLAUBS_LIMIT+' Urlaubstage '+(over?('· '+(used-URLAUBS_LIMIT)+' zu viel!'):('· '+rest+' übrig'))+'</span>';
+
+    var prior = priorYearMMDD(person, STATE.year);
+    var rep = 0;
+    for (var r=0;r<person.urlaub.length;r++){ var du=person.urlaub[r]; if (du.slice(0,4)===String(STATE.year) && prior[du.slice(5)]) rep++; }
+    if (rep>0) h += '<span class="cnt" style="background:'+COL.vorjahr+';color:#000;box-shadow:inset 0 0 0 2px #000;">↻ '+rep+' '+(rep===1?'Tag':'Tage')+' wie im Vorjahr</span>';
+    h += '</div>';
+
+    h += '<div class="card"><div class="monthgrid">';
+    for (var m=0;m<12;m++) h += monthCardHtml(person, m, prior);
+    h += '</div></div>';
+    h += '<p class="hint">Tipp: Tag antippen = Urlaub setzen oder löschen. Oben die Person umschalten. Deine Daten liegen lokal auf diesem Gerät.</p>';
+  } else {
+    h += '<div class="card scroll">'+tableHtml()+'</div>';
+    h += '<p class="hint">Ganzes Team auf einen Blick. Auf dem Handy seitlich wischen. Ferien Hessen (Kultusministerium) sind gelb hinterlegt.</p>';
+  }
+  return h;
+}
+
+function monthCardHtml(person, month, prior){
+  var year = STATE.year;
+  var ferSet = FERSETS[year] || (FERSETS[year] = ferienDaysSet(year));
+  var today = TODAY;
+  var dim = daysInMonth(year, month);
+  var firstDow = (new Date(year, month, 1).getDay() + 6) % 7;
+  var h = '<div class="month"><h4>'+MONTHS_FULL[month]+'</h4><div class="dow">';
+  for (var w=0;w<7;w++) h += '<span>'+WD_MON[w]+'</span>';
+  h += '</div><div class="days">';
+  for (var i=0;i<firstDow;i++) h += '<div class="day empty"></div>';
+  for (var d=1;d<=dim;d++){
+    var ds = iso(year, month, d);
+    var dow = new Date(year, month, d).getDay();
+    var isWe = (dow===0 || dow===6);
+    var isFer = !!ferSet[ds];
+    var ftName = feiertagName(ds);
+    var isUrl = person.urlaub.indexOf(ds) >= 0;
+    var isRepeat = isUrl && !!prior[ds.slice(5)];
+    var isTod = (ds===today);
+
+    var bg = "#fff", color = "#000", fw = "500";
+    if (isWe){ bg = COL.weekend; color = "#6b6b6b"; }
+    if (isFer){ bg = COL.ferien; color = "#000"; }
+    if (ftName){ bg = "#000"; color = "#fff"; fw = "800"; }
+    if (isUrl){ bg = COL.accent; color = "#fff"; fw = "800"; }
+    if (isRepeat){ bg = COL.vorjahr; color = "#000"; fw = "800"; }
+    var style = "background:"+bg+";color:"+color+";font-weight:"+fw+";";
+    if (isTod) style += "border:3px solid "+COL.accent+";";
+    if (isRepeat) style += "box-shadow:inset 0 0 0 3px #000;";
+    if (isFer && isUrl && !isRepeat) style += "background-image:repeating-linear-gradient(45deg,"+COL.accent+","+COL.accent+" 6px,"+COL.ferien+" 6px,"+COL.ferien+" 12px);";
+    var title = ftName ? ftName : (isRepeat ? "Selber Tag wie im Vorjahr" : "");
+    h += '<div class="day" data-day="'+ds+'" data-person="'+person.id+'" style="'+style+'" title="'+esc(title)+'">'+d+(isRepeat?'<span class="rep" style="color:#000;">↻</span>':'')+'</div>';
+  }
+  h += '</div></div>';
+  return h;
+}
+
+function tableHtml(){
+  var year = STATE.year;
+  var ferSet = FERSETS[year] || (FERSETS[year] = ferienDaysSet(year));
+  var today = TODAY;
+  var emps = STATE.data.employees;
+  var m, d;
+
+  // Überschneidungen pro Tag zählen
+  var proTag = {};
+  for (var e=0;e<emps.length;e++){
+    var u = emps[e].urlaub;
+    for (var q=0;q<u.length;q++){ if (u[q].slice(0,4)===String(year)) proTag[u[q]] = (proTag[u[q]]||0)+1; }
+  }
+
+  var h = '<table class="cal"><thead><tr>';
+  h += '<th class="nameh" rowspan="2">Mitarbeiter</th>';
+  h += '<th class="uhead" rowspan="2">Urlaub<br>/ '+URLAUBS_LIMIT+'</th>';
+  for (m=0;m<12;m++) h += '<th class="mhead" colspan="'+daysInMonth(year,m)+'">'+MONTHS[m]+'</th>';
+  h += '</tr><tr>';
+  for (m=0;m<12;m++){
+    var dm = daysInMonth(year,m);
+    for (d=0;d<dm;d++){
+      var dow = new Date(year,m,d+1).getDay();
+      h += '<th style="'+(d===0?'border-left:3px solid #000;':'')+'">'+(d+1)+'<br>'+WD[dow]+'</th>';
+    }
+  }
+  h += '</tr></thead><tbody>';
+
+  for (var i=0;i<emps.length;i++){
+    var emp = emps[i];
+    var prior = priorYearMMDD(emp, year);
+    var fr = FACH_ROW[emp.fach];
+    var nameBg = "#fff";
+    var nameStyle = "background:"+nameBg+";color:"+(emp.me?COL.accent:"#000")+";";
+    if (fr) nameStyle += "border-left:4px solid "+fr.line+";";
+    var used = zaehleUrlaub(emp, year);
+    var over = used > URLAUBS_LIMIT;
+    var tight = !over && (URLAUBS_LIMIT - used) <= 3;
+
+    h += '<tr>';
+    h += '<td class="name" style="'+nameStyle+'">'+esc(emp.name)+(emp.fach?'<small>'+emp.fach+'</small>':'')+'</td>';
+    var uStyle = over ? "background:"+COL.over+";color:#fff;" : (tight ? "background:"+COL.overBg+";color:"+COL.over+";" : "");
+    h += '<td class="ucell" style="'+uStyle+'">'+used+(over?' ⚠':'')+'</td>';
+
+    for (m=0;m<12;m++){
+      var dm2 = daysInMonth(year,m);
+      for (d=0;d<dm2;d++){
+        var ds = iso(year,m,d);
+        var dow2 = new Date(year,m,d+1).getDay();
+        var isWe = (dow2===0 || dow2===6);
+        var isFer = !!ferSet[ds];
+        var ftName = feiertagName(ds);
+        var isUrl = emp.urlaub.indexOf(ds) >= 0;
+        var isRepeat = isUrl && !!prior[ds.slice(5)];
+        var isOverlap = isUrl && (proTag[ds]||0) >= 2;
+        var isTod = (ds===today);
+
+        var bg = "#fff";
+        if (isWe) bg = COL.weekend;
+        if (isFer) bg = COL.ferien;
+        if (ftName) bg = "#000";
+        if (isUrl) bg = COL.accent;
+        if (isRepeat && !isOverlap) bg = COL.vorjahr;
+
+        var st = "background:"+bg+";";
+        st += "border-left:"+(d===0?"3px solid #000":"1px solid #000")+";";
+        if (isOverlap && isRepeat) st += "box-shadow:inset 0 0 0 3px #000;";
+        else if (isRepeat) st += "box-shadow:inset 0 0 0 2px #000;";
+        if (isOverlap) st += "background-image:repeating-linear-gradient(45deg,"+COL.accent+","+COL.accent+" 4px,#000 4px,#000 7px);";
+        else if (isFer && isUrl && !isRepeat) st += "background-image:repeating-linear-gradient(45deg,"+COL.accent+","+COL.accent+" 5px,"+COL.ferien+" 5px,"+COL.ferien+" 10px);";
+        if (isTod) st += "outline:3px solid "+COL.accent+";outline-offset:-3px;";
+
+        var tip = esc(emp.name)+" · "+(d+1)+". "+MONTHS_FULL[m]+" "+year;
+        if (ftName) tip += " — "+ftName;
+        if (isFer) tip += " (Ferien)";
+        if (isOverlap) tip += " — Überschneidung ("+proTag[ds]+" im Urlaub)";
+        if (isRepeat) tip += " — wie im Vorjahr";
+        h += '<td class="daycell" style="'+st+'" title="'+tip+'" data-day="'+ds+'" data-person="'+emp.id+'"></td>';
+      }
+    }
+    h += '</tr>';
+  }
+  h += '</tbody></table>';
+  return h;
+}
+
+function renderTeam(){
+  var emps = STATE.data.employees;
+  var h = '<div class="card" style="padding:16px;">';
+  h += '<p class="sub">'+emps.length+' Personen im Team VK2. Namen anpassen, Geburtstag hinterlegen oder Personen verwalten.</p>';
+  h += '<div>';
+  for (var i=0;i<emps.length;i++){
+    var e = emps[i];
+    h += '<div class="emprow">';
+    h += '<span class="nm">'+esc(e.name)+'</span>';
+    if (e.me) h += '<span class="badge me">ICH</span>';
+    if (e.fach) h += '<span class="badge fach" style="background:'+(FACH_FARBE[e.fach]||"#6b6b6b")+';">'+e.fach+'</span>';
+    if (e.azubi) h += '<span class="badge outline">Azubi</span>';
+    if (e.teilzeit) h += '<span class="badge outline">Teilzeit</span>';
+    if (e.vollzeit) h += '<span class="badge grey">Vollzeit</span>';
+    if (e.pflege) h += '<span class="badge black">🫂 Pflege</span>';
+    if (e.schulkinder) h += '<span class="badge black">🎒 Schulkinder</span>';
+    h += '<span class="spacer"></span>';
+    h += '<span style="color:#6b6b6b;font-size:13px;">'+(e.birthday?('🎂 '+fmtBday(e.birthday)):'kein Geburtstag')+'</span>';
+    h += '<button class="btn ghost sm" data-edit="'+e.id+'">Bearbeiten</button>';
+    if (!e.me) h += '<button class="btn red-ghost" data-del="'+e.id+'">Entfernen</button>';
+    h += '</div>';
+  }
+  h += '</div>';
+  h += '<div style="margin-top:16px;"><button class="btn" id="addPerson">+ Person hinzufügen</button></div>';
+
+  h += '<div class="exportbox"><h3>Daten sichern &amp; übertragen</h3>';
+  h += '<p class="sub" style="margin-bottom:12px;">Deine Daten liegen nur auf diesem Gerät. Zum Übertragen auf ein anderes Gerät (z.&nbsp;B. Handy&nbsp;→&nbsp;PC): hier <b>exportieren</b>, die Datei aufs andere Gerät bringen und dort <b>importieren</b>.</p>';
+  h += '<div class="exportrow">';
+  h += '<button class="btn black" id="btnExport">⬇ Exportieren (Datei)</button>';
+  h += '<button class="btn ghost" id="btnImport">⬆ Importieren (Datei)</button>';
+  h += '<input type="file" id="fileImport" accept="application/json,.json" style="display:none;">';
+  h += '</div></div>';
+
+  h += '</div>';
+  return h;
+}
+
+function renderBday(){
+  var emps = STATE.data.employees;
+  var withB = [];
+  for (var i=0;i<emps.length;i++) if (emps[i].birthday) withB.push(emps[i]);
+  var now = new Date();
+  var base = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  function du(b){
+    var p = b.split("-");
+    var mm = p.length===3 ? +p[1] : +p[0];
+    var dd = p.length===3 ? +p[2] : +p[1];
+    var next = new Date(now.getFullYear(), mm-1, dd);
+    if (next < base) next = new Date(now.getFullYear()+1, mm-1, dd);
+    return Math.round((next-base)/86400000);
+  }
+  withB.sort(function(a,b){ return du(a.birthday)-du(b.birthday); });
+
+  if (withB.length===0){
+    return '<div class="card" style="padding:16px;"><div class="empty">Noch keine Geburtstage hinterlegt.<br>Trage sie im Reiter „Mitarbeiter" pro Person ein.</div></div>';
+  }
+  var h = '<div class="card"><div style="padding:16px 16px 0;"><p class="sub">Sortiert nach dem nächsten anstehenden Geburtstag.</p></div><div class="bdaygrid">';
+  for (var k=0;k<withB.length;k++){
+    var e = withB[k];
+    var d = du(e.birthday);
+    var soon = d <= 14;
+    h += '<div class="bcard'+(soon?' soon':'')+'"><span class="cake">🎂</span><div><div class="bn">'+esc(e.name)+'</div><div class="bd">'+fmtBday(e.birthday)+' · '+(d===0?'heute! 🎉':'in '+d+' Tagen')+'</div></div></div>';
+  }
+  h += '</div></div>';
+  return h;
+}
+
+/* ====================== MODAL (Bearbeiten) ====================== */
+function openEdit(id){
+  var emps = STATE.data.employees, emp = null;
+  for (var i=0;i<emps.length;i++) if (emps[i].id===id){ emp = emps[i]; break; }
+  if (!emp) return;
+
+  var bParts = emp.birthday ? emp.birthday.split("-") : null;
+  var initDate = bParts ? (bParts.length===3 ? emp.birthday : "2000-"+bParts[0]+"-"+bParts[1]) : "";
+
+  var overlay = document.createElement("div");
+  overlay.className = "modal-bg";
+  var h = '<div class="modal"><h3>Bearbeiten</h3><div class="fields">';
+  h += '<div><label class="lbl">Name</label><input type="text" id="mName" value="'+esc(emp.name)+'"></div>';
+  h += '<div><label class="lbl">Fachbereich</label><select id="mFach"><option value="">— kein Fachbereich —</option>';
+  for (var f=0;f<FACHBEREICHE.length;f++){ h += '<option value="'+FACHBEREICHE[f]+'"'+(emp.fach===FACHBEREICHE[f]?' selected':'')+'>'+FACHBEREICHE[f]+'</option>'; }
+  h += '</select></div>';
+  h += chkHtml("mAzubi", emp.azubi, "Auszubildende:r");
+  h += chkHtml("mVollzeit", emp.vollzeit, "Vollzeit");
+  h += chkHtml("mTeilzeit", emp.teilzeit, "Teilzeit");
+  h += chkHtml("mPflege", emp.pflege, "Pflegebedürftige Angehörige");
+  h += chkHtml("mSchul", emp.schulkinder, "Hat schulpflichtige Kinder");
+  h += '<div><label class="lbl">Geburtstag (Jahr egal)</label><input type="date" id="mBday" value="'+initDate+'"></div>';
+  h += '</div><div class="actions"><button class="btn ghost" id="mCancel">Abbrechen</button><button class="btn" id="mSave">Speichern</button></div></div>';
+  overlay.innerHTML = h;
+  document.body.appendChild(overlay);
+
+  function upd(){
+    overlay.querySelector('[data-for=mAzubi]').classList.toggle("on", document.getElementById("mAzubi").checked);
+    overlay.querySelector('[data-for=mVollzeit]').classList.toggle("on", document.getElementById("mVollzeit").checked);
+    overlay.querySelector('[data-for=mTeilzeit]').classList.toggle("on", document.getElementById("mTeilzeit").checked);
+    overlay.querySelector('[data-for=mPflege]').classList.toggle("on", document.getElementById("mPflege").checked);
+    overlay.querySelector('[data-for=mSchul]').classList.toggle("on", document.getElementById("mSchul").checked);
+  }
+  // Vollzeit / Teilzeit gegenseitig ausschließen
+  document.getElementById("mVollzeit").addEventListener("change", function(){ if(this.checked) document.getElementById("mTeilzeit").checked=false; upd(); });
+  document.getElementById("mTeilzeit").addEventListener("change", function(){ if(this.checked) document.getElementById("mVollzeit").checked=false; upd(); });
+  document.getElementById("mAzubi").addEventListener("change", upd);
+  document.getElementById("mPflege").addEventListener("change", upd);
+  document.getElementById("mSchul").addEventListener("change", upd);
+
+  overlay.addEventListener("mousedown", function(ev){ if (ev.target === overlay) document.body.removeChild(overlay); });
+  document.getElementById("mCancel").addEventListener("click", function(){ document.body.removeChild(overlay); });
+  document.getElementById("mSave").addEventListener("click", function(){
+    var name = document.getElementById("mName").value.trim() || emp.name;
+    var bday = document.getElementById("mBday").value;
+    var b = "";
+    if (bday){ var p = bday.split("-"); b = p[1]+"-"+p[2]; }
+    emp.name = name;
+    emp.fach = document.getElementById("mFach").value;
+    emp.azubi = document.getElementById("mAzubi").checked;
+    emp.vollzeit = document.getElementById("mVollzeit").checked;
+    emp.teilzeit = document.getElementById("mTeilzeit").checked;
+    emp.pflege = document.getElementById("mPflege").checked;
+    emp.schulkinder = document.getElementById("mSchul").checked;
+    emp.birthday = b;
+    saveData();
+    document.body.removeChild(overlay);
+    render();
+  });
+}
+function chkHtml(id, on, label){
+  return '<label class="chk'+(on?' on':'')+'" data-for="'+id+'"><input type="checkbox" id="'+id+'"'+(on?' checked':'')+'> <span>'+label+'</span></label>';
+}
+
+/* ====================== EVENTS ====================== */
+function bindEvents(){
+  var app = document.getElementById("app");
+
+  var tabs = app.querySelectorAll("[data-tab]");
+  tabs.forEach(function(b){ b.addEventListener("click", function(){ STATE.tab = b.getAttribute("data-tab"); render(); }); });
+
+  var yn = app.querySelectorAll("[data-year]");
+  yn.forEach(function(b){ b.addEventListener("click", function(){ STATE.year += parseInt(b.getAttribute("data-year"),10); render(); }); });
+
+  var vt = app.querySelectorAll("[data-view]");
+  vt.forEach(function(b){ b.addEventListener("click", function(){ STATE.view = b.getAttribute("data-view"); render(); }); });
+
+  var sp = document.getElementById("selPerson");
+  if (sp) sp.addEventListener("change", function(){ STATE.selPerson = sp.value; render(); });
+
+  var days = app.querySelectorAll("[data-day]");
+  days.forEach(function(c){
+    c.addEventListener("click", function(){ toggleDay(c.getAttribute("data-person"), c.getAttribute("data-day")); });
   });
 
-  return (
-    <table style={{ borderCollapse: "collapse", width: "100%", fontSize: 11 }}>
-      <thead>
-        <tr>
-          <th style={nameTh} rowSpan={2}>Mitarbeiter</th>
-          <th style={{ ...th, position: "sticky", left: 150, zIndex: 3, background: "#000000", fontSize: 11, color: "#ffffff", minWidth: 62, padding: "4px 6px" }} rowSpan={2}>Urlaub<br />/ {URLAUBS_LIMIT}</th>
-          {[...Array(12).keys()].map((m) => (
-            <th key={m} style={{ ...th, fontSize: 12, color: "#ffffff", background: "#000000" }} colSpan={daysInMonth(year, m)}>{MONTHS[m]}</th>
-          ))}
-        </tr>
-        <tr>
-          {[...Array(12).keys()].flatMap((m) =>
-            Array.from({ length: daysInMonth(year, m) }, (_, d) => {
-              const dow = new Date(year, m, d + 1).getDay();
-              return (<th key={m + "-" + d} style={{ ...th, borderLeft: d === 0 ? "3px solid #000000" : `1px solid ${C.line}` }}>{d + 1}<br />{WD[dow]}</th>);
-            })
-          )}
-        </tr>
-      </thead>
-      <tbody>
-        {data.employees.map((emp) => {
-          const prior = priorYearMMDD(emp, year);
-          const fr = FACH_ROW[emp.fach];
-          const nameBg = fr ? fr.bg : C.card;
-          const used = zaehleUrlaub(emp);
-          const over = used > URLAUBS_LIMIT;
-          const tight = !over && URLAUBS_LIMIT - used <= 3;
-          return (
-          <tr key={emp.id}>
-            <td style={{ position: "sticky", left: 0, zIndex: 2, background: nameBg, textAlign: "left", padding: "6px 10px", fontSize: 13, fontWeight: 600, minWidth: 150, whiteSpace: "nowrap", border: `1px solid ${C.line}`, borderLeft: fr ? `4px solid ${fr.line}` : `1px solid ${C.line}`, color: emp.me ? C.accent : C.ink }}>
-              {emp.name}
-              {emp.fach && <span style={{ display: "block", fontSize: 10, color: C.muted, fontWeight: 500 }}>{emp.fach}</span>}
-            </td>
-            <td style={{ position: "sticky", left: 150, zIndex: 2, textAlign: "center", fontSize: 13, fontWeight: 700, border: `1px solid ${C.line}`, minWidth: 62,
-              background: over ? C.over : tight ? C.overBg : "#fff",
-              color: over ? "#fff" : tight ? C.over : C.ink }}
-              title={over ? (used - URLAUBS_LIMIT) + " Tage über dem Limit!" : (URLAUBS_LIMIT - used) + " Tage übrig"}>
-              {used}{over ? " ⚠" : ""}
-            </td>
-            {[...Array(12).keys()].flatMap((m) =>
-              Array.from({ length: daysInMonth(year, m) }, (_, d) => {
-                const ds = iso(year, m, d);
-                const dow = new Date(year, m, d + 1).getDay();
-                const isWe = dow === 0 || dow === 6;
-                const isFer = ferSet.has(ds);
-                const ftName = feiertagName(ds);
-                const isUrl = emp.urlaub.includes(ds);
-                const isRepeat = isUrl && prior.has(ds.slice(5));
-                const isOverlap = isUrl && (urlaubProTag[ds] || 0) >= 2; // mind. 2 MA im Urlaub
-                const isTod = ds === today;
-                let bg = "#ffffff";
-                if (isWe) bg = C.weekend;
-                if (isFer) bg = C.ferien;
-                if (ftName) bg = "#000000";      // Feiertag = schwarz voll
-                if (isUrl) bg = C.accent;        // Urlaub = rot voll
-                if (isRepeat && !isOverlap) bg = C.vorjahr;  // reine Wiederholung = gelb voll
-                // Rahmen / Muster zur Unterscheidung bei nur 4 Farben
-                let shadow = "none";
-                if (isOverlap && isRepeat) shadow = `inset 0 0 0 3px #000000`;   // Überschn.+Vorjahr = dicker schwarzer Rahmen
-                else if (isRepeat) shadow = `inset 0 0 0 2px #000000`;           // Vorjahr = schwarzer Rahmen
-                // Überschneidung = schwarzes Diagonalmuster auf Rot
-                let bgImage = "none";
-                if (isOverlap) bgImage = `repeating-linear-gradient(45deg, ${C.accent}, ${C.accent} 4px, #000000 4px, #000000 7px)`;
-                else if (isFer && isUrl && !isRepeat) bgImage = `repeating-linear-gradient(45deg, ${C.accent}, ${C.accent} 5px, ${C.ferien} 5px, ${C.ferien} 10px)`;
-                const style = {
-                  width: 20, height: 30, cursor: "pointer", border: `1px solid #000000`,
-                  borderLeft: d === 0 ? "3px solid #000000" : `1px solid #000000`,
-                  background: bg,
-                  boxShadow: shadow,
-                  outline: isTod ? `3px solid ${C.accent}` : "none", outlineOffset: -3,
-                  backgroundImage: bgImage,
-                };
-                const tip = emp.name + " · " + (d + 1) + ". " + MONTHS_FULL[m] + " " + year
-                  + (ftName ? " — " + ftName : "") + (isFer ? " (Ferien)" : "")
-                  + (isOverlap ? " — Überschneidung (" + urlaubProTag[ds] + " im Urlaub)" : "")
-                  + (isRepeat ? " — wie im Vorjahr" : "");
-                return (<td key={ds} style={style} title={tip} onClick={() => onToggle(emp.id, ds)} />);
-              })
-            )}
-          </tr>
-          );
-        })}
-      </tbody>
-    </table>
-  );
+  var edits = app.querySelectorAll("[data-edit]");
+  edits.forEach(function(b){ b.addEventListener("click", function(){ openEdit(b.getAttribute("data-edit")); }); });
+
+  var dels = app.querySelectorAll("[data-del]");
+  dels.forEach(function(b){ b.addEventListener("click", function(){
+    var id = b.getAttribute("data-del");
+    var emps = STATE.data.employees, nm = "";
+    for (var i=0;i<emps.length;i++) if (emps[i].id===id) nm = emps[i].name;
+    if (confirm(nm+" wirklich entfernen?")){
+      STATE.data.employees = emps.filter(function(e){ return e.id !== id; });
+      saveData(); render();
+    }
+  }); });
+
+  var add = document.getElementById("addPerson");
+  if (add) add.addEventListener("click", function(){
+    var id = "e"+Date.now();
+    STATE.data.employees.push(mk(id, "Neuer Mitarbeiter", {}));
+    saveData(); render();
+  });
+
+  var ex = document.getElementById("btnExport");
+  if (ex) ex.addEventListener("click", exportToFile);
+
+  var im = document.getElementById("btnImport");
+  var fi = document.getElementById("fileImport");
+  if (im && fi){
+    im.addEventListener("click", function(){ fi.click(); });
+    fi.addEventListener("change", function(){
+      var f = fi.files && fi.files[0];
+      if (!f) return;
+      var reader = new FileReader();
+      reader.onload = function(){
+        try {
+          var imported = JSON.parse(reader.result);
+          if (!imported || !imported.employees || !imported.employees.length) throw new Error("Format");
+          if (confirm("Import überschreibt die aktuellen Daten auf diesem Gerät. Fortfahren?")){
+            STATE.data = imported; saveData();
+            alert("Daten erfolgreich importiert.");
+            render();
+          }
+        } catch(err){ alert("Import fehlgeschlagen: keine gültige VK2-Datei."); }
+        fi.value = "";
+      };
+      reader.readAsText(f);
+    });
+  }
 }
 
-function TeamTab({ C, data, persist, setEditEmp }) {
-  const fileRef = useRef(null);
-  const btn = (bg, color, extra) => ({ border: "none", background: bg, color, padding: "8px 12px", borderRadius: 0, fontWeight: 600, cursor: "pointer", fontSize: 14, ...extra });
-  return (
-    <div style={{ background: C.card, border: `2px solid ${C.line}`, borderRadius: 0, padding: 16 }}>
-      <p style={{ color: C.muted, fontSize: 13, margin: "2px 0 14px" }}>
-        {data.employees.length} Personen im Team VK2. Namen anpassen, Geburtstag hinterlegen oder Personen verwalten.
-      </p>
-      <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-        {data.employees.map((emp) => (
-          <div key={emp.id} style={{ display: "flex", alignItems: "center", gap: 8, padding: "11px 10px", borderRadius: 0, flexWrap: "wrap", borderBottom: `1px solid ${C.line}` }}>
-            <span style={{ fontWeight: 700, minWidth: 120 }}>{emp.name}</span>
-            {emp.me && <span style={{ fontSize: 11, background: C.accent, color: "#fff", padding: "2px 8px", borderRadius: 0, fontWeight: 700, letterSpacing: 0.5 }}>ICH</span>}
-            {emp.fach && <span style={{ fontSize: 11, background: (FACH_FARBE[emp.fach] || C.muted), color: "#fff", padding: "2px 8px", borderRadius: 0, fontWeight: 700 }}>{emp.fach}</span>}
-            {emp.azubi && <span style={{ fontSize: 11, background: "#fff", color: "#000", border: "1.5px solid #000", padding: "1px 8px", borderRadius: 0, fontWeight: 700 }}>Azubi</span>}
-            {emp.teilzeit && <span style={{ fontSize: 11, background: "#fff", color: "#000", border: "1.5px solid #000", padding: "1px 8px", borderRadius: 0, fontWeight: 700 }}>Teilzeit</span>}
-            {emp.vollzeit && <span style={{ fontSize: 11, background: "#e0e0e0", color: "#000", padding: "2px 8px", borderRadius: 0, fontWeight: 700 }}>Vollzeit</span>}
-            {emp.pflege && <span style={{ fontSize: 11, background: "#000", color: "#fff", padding: "2px 8px", borderRadius: 0, fontWeight: 700 }}>🫂 Pflege</span>}
-            {emp.schulkinder && <span style={{ fontSize: 11, background: "#000", color: "#fff", padding: "2px 8px", borderRadius: 0, fontWeight: 700 }}>🎒 Schulkinder</span>}
-            <span style={{ flex: 1 }} />
-            <span style={{ color: C.muted, fontSize: 13 }}>{emp.birthday ? "🎂 " + fmtBday(emp.birthday) : "kein Geburtstag"}</span>
-            <button style={btn(C.bg, C.ink, { border: `1px solid ${C.line}` })} onClick={() => setEditEmp(emp)}>Bearbeiten</button>
-            {!emp.me && (
-              <button style={btn("#fff", C.accent, { border: `1.5px solid ${C.accent}` })} onClick={() => { if (confirm(emp.name + " wirklich entfernen?")) persist({ ...data, employees: data.employees.filter((x) => x.id !== emp.id) }); }}>
-                Entfernen
-              </button>
-            )}
-          </div>
-        ))}
-      </div>
-      <div style={{ marginTop: 16 }}>
-        <button
-          style={btn(C.accent, "#fff", { padding: "11px 16px", fontSize: 15 })}
-          onClick={() => { const id = "e" + Date.now(); persist({ ...data, employees: [...data.employees, { id, name: "Neuer Mitarbeiter", me: false, birthday: "", urlaub: [], azubi: false, schulkinder: false, pflege: false, teilzeit: false, vollzeit: false, fach: "" }] }); }}
-        >
-          + Person hinzufügen
-        </button>
-      </div>
-
-      <div style={{ marginTop: 24, borderTop: "2px solid #000", paddingTop: 16 }}>
-        <h3 style={{ fontSize: 15, textTransform: "uppercase", letterSpacing: 0.5, margin: "0 0 6px" }}>Daten sichern & übertragen</h3>
-        <p style={{ color: C.muted, fontSize: 13, margin: "0 0 12px", lineHeight: 1.5 }}>
-          Deine Daten liegen nur auf diesem Gerät. Zum Übertragen auf ein anderes Gerät (z.&nbsp;B. Handy&nbsp;→&nbsp;PC): hier <b>exportieren</b>, die Datei aufs andere Gerät bringen und dort <b>importieren</b>.
-        </p>
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          <button style={btn("#000", "#fff", { padding: "11px 16px", fontSize: 14 })} onClick={() => exportToFile(data)}>
-            ⬇ Exportieren (Datei)
-          </button>
-          <button style={btn("#fff", "#000", { padding: "11px 16px", fontSize: 14, border: "2px solid #000" })} onClick={() => fileRef.current && fileRef.current.click()}>
-            ⬆ Importieren (Datei)
-          </button>
-          <input
-            ref={fileRef}
-            type="file"
-            accept="application/json,.json"
-            style={{ display: "none" }}
-            onChange={(e) => {
-              const f = e.target.files && e.target.files[0];
-              if (!f) return;
-              const reader = new FileReader();
-              reader.onload = () => {
-                try {
-                  const imported = JSON.parse(reader.result);
-                  if (!imported || !Array.isArray(imported.employees)) throw new Error("Ungültiges Format");
-                  if (confirm("Import überschreibt die aktuellen Daten auf diesem Gerät. Fortfahren?")) {
-                    persist(imported);
-                    alert("Daten erfolgreich importiert.");
-                  }
-                } catch (err) {
-                  alert("Import fehlgeschlagen: keine gültige VK2-Datei.");
-                }
-                e.target.value = "";
-              };
-              reader.readAsText(f);
-            }}
-          />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function Birthdays({ C, data }) {
-  const withB = data.employees.filter((e) => e.birthday);
-  const now = new Date();
-  const key = (b) => { const p = b.split("-"); const mm = p.length === 3 ? +p[1] : +p[0]; const dd = p.length === 3 ? +p[2] : +p[1]; return { mm, dd }; };
-  const daysUntil = (b) => {
-    const { mm, dd } = key(b);
-    const base = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    let next = new Date(now.getFullYear(), mm - 1, dd);
-    if (next < base) next = new Date(now.getFullYear() + 1, mm - 1, dd);
-    return Math.round((next - base) / 86400000);
-  };
-  const sorted = [...withB].sort((a, b) => daysUntil(a.birthday) - daysUntil(b.birthday));
-
-  if (sorted.length === 0)
-    return (
-      <div style={{ background: C.card, border: `2px solid ${C.line}`, borderRadius: 0, padding: 16 }}>
-        <div style={{ color: C.muted, padding: 24, textAlign: "center", lineHeight: 1.6 }}>
-          Noch keine Geburtstage hinterlegt.<br />Trage sie im Reiter „Mitarbeiter" pro Person ein.
-        </div>
-      </div>
-    );
-
-  return (
-    <div style={{ background: C.card, border: `2px solid ${C.line}`, borderRadius: 0, overflow: "hidden" }}>
-      <div style={{ padding: "16px 16px 0" }}>
-        <p style={{ color: C.muted, fontSize: 13, margin: "2px 0 14px" }}>Sortiert nach dem nächsten anstehenden Geburtstag.</p>
-      </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(240px,1fr))", gap: 10, padding: 16 }}>
-        {sorted.map((e) => {
-          const du = daysUntil(e.birthday);
-          const soon = du <= 14;
-          return (
-            <div key={e.id} style={{ border: soon ? `3px solid ${C.accent}` : `1.5px solid #000`, background: soon ? "#f7c6c9" : "#fff", borderRadius: 0, padding: 14, display: "flex", alignItems: "center", gap: 12 }}>
-              <span style={{ fontSize: 26 }}>🎂</span>
-              <div>
-                <div style={{ fontWeight: 700 }}>{e.name}</div>
-                <div style={{ color: C.muted, fontSize: 13 }}>{fmtBday(e.birthday)} · {du === 0 ? "heute! 🎉" : "in " + du + " Tagen"}</div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-function EditModal({ C, emp, onClose, onSave }) {
-  const [name, setName] = useState(emp.name);
-  const bParts = emp.birthday ? emp.birthday.split("-") : null;
-  const initDate = bParts ? (bParts.length === 3 ? emp.birthday : "2000-" + bParts[0] + "-" + bParts[1]) : "";
-  const [bday, setBday] = useState(initDate);
-  const [fach, setFach] = useState(emp.fach || "");
-  const [azubi, setAzubi] = useState(!!emp.azubi);
-  const [schulkinder, setSchulkinder] = useState(!!emp.schulkinder);
-  const [pflege, setPflege] = useState(!!emp.pflege);
-  const [teilzeit, setTeilzeit] = useState(!!emp.teilzeit);
-  const [vollzeit, setVollzeit] = useState(!!emp.vollzeit);
-  const inp = { width: "100%", fontSize: 16, padding: "10px 12px", border: `1px solid ${C.line}`, borderRadius: 0, background: "#fff" };
-  const lbl = { fontSize: 12, color: C.muted, fontWeight: 600, display: "block", marginBottom: 5 };
-  const check = (val, set, label) => (
-    <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", padding: "10px 12px", border: `1.5px solid #000`, borderRadius: 0, background: val ? "#f7c6c9" : "#fff" }}>
-      <input type="checkbox" checked={val} onChange={(e) => set(e.target.checked)} style={{ width: 18, height: 18, cursor: "pointer" }} />
-      <span style={{ fontSize: 15 }}>{label}</span>
-    </label>
-  );
-  return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(15,23,42,0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 50, padding: 16 }} onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div style={{ background: "#fff", borderRadius: 0, padding: 22, width: "100%", maxWidth: 380, maxHeight: "90vh", overflowY: "auto", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
-        <h3 style={{ marginBottom: 14 }}>Bearbeiten</h3>
-        <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 18 }}>
-          <div>
-            <label style={lbl}>Name</label>
-            <input value={name} onChange={(e) => setName(e.target.value)} style={inp} autoFocus />
-          </div>
-          <div>
-            <label style={lbl}>Fachbereich</label>
-            <select value={fach} onChange={(e) => setFach(e.target.value)} style={inp}>
-              <option value="">— kein Fachbereich —</option>
-              {FACHBEREICHE.map((f) => (<option key={f} value={f}>{f}</option>))}
-            </select>
-          </div>
-          {check(azubi, setAzubi, "Auszubildende:r")}
-          {check(vollzeit, (v) => { setVollzeit(v); if (v) setTeilzeit(false); }, "Vollzeit")}
-          {check(teilzeit, (v) => { setTeilzeit(v); if (v) setVollzeit(false); }, "Teilzeit")}
-          {check(pflege, setPflege, "Pflegebedürftige Angehörige")}
-          {check(schulkinder, setSchulkinder, "Hat schulpflichtige Kinder")}
-          <div>
-            <label style={lbl}>Geburtstag (Jahr egal)</label>
-            <input type="date" value={bday} onChange={(e) => setBday(e.target.value)} style={inp} />
-          </div>
-        </div>
-        <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
-          <button onClick={onClose} style={{ border: `1px solid ${C.line}`, background: C.bg, color: C.ink, padding: "11px 16px", borderRadius: 0, fontWeight: 600, cursor: "pointer", fontSize: 15 }}>Abbrechen</button>
-          <button
-            onClick={() => { let b = ""; if (bday) { const p = bday.split("-"); b = p[1] + "-" + p[2]; } onSave({ ...emp, name: name.trim() || emp.name, birthday: b, fach, azubi, schulkinder, pflege, teilzeit, vollzeit }); }}
-            style={{ border: "none", background: C.accent, color: "#fff", padding: "11px 16px", borderRadius: 0, fontWeight: 600, cursor: "pointer", fontSize: 15 }}
-          >
-            Speichern
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(<App />);
+/* ====================== START ====================== */
+var FERSETS = {};
+var TODAY = todayISO();
+initData();
+render();
 </script>
 </body>
 </html>
