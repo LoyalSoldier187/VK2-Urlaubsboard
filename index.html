@@ -3,117 +3,130 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="theme-color" content="#e30613" />
+<meta name="theme-color" content="#b98a94" />
 <title>VK2 Urlaubsboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
 <style>
+  :root {
+    --creme: #f6f1ea; --creme-2: #efe7db; --taupe: #b8a894; --taupe-d: #8f8071;
+    --berry: #a86b7e; --berry-l: #d9b8c1; --berry-bg: #f3e3e8;
+    --ink: #4a4038; --muted: #9a8d7f; --line: #e4d9ca; --white: #ffffff;
+    --ferien: #e7d3a1; --ferien-d: #c9ac6b; --weekend: #f0ebe3; --today: #a86b7e;
+    --kw-a: #f6f1ea; --kw-b: #ece3ef;
+    --radius: 16px; --radius-sm: 10px;
+    --shadow: 0 2px 10px rgba(120,100,90,0.10); --shadow-lg: 0 6px 22px rgba(120,100,90,0.16);
+  }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { margin: 0; padding: 0; -webkit-text-size-adjust: 100%; }
-  body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    color: #000; background: #eeeeee; padding: 12px;
-  }
-  .wrap { max-width: 1200px; margin: 0 auto; }
-  h1 {
-    font-size: 24px; letter-spacing: -0.5px; margin: 0;
-    display: flex; align-items: center; gap: 10px;
-    text-transform: uppercase; font-weight: 800;
-  }
-  header.top {
-    display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
-    border-bottom: 4px solid #000; padding-bottom: 10px;
-  }
-  .vk2badge { background: #e30613; color: #fff; font-size: 13px; padding: 4px 10px; font-weight: 800; letter-spacing: 2px; }
-  .tabs { display: flex; gap: 0; background: #fff; border: 2px solid #000; margin-bottom: 14px; }
-  .tab { flex: 1; padding: 10px; border: none; background: transparent; color: #000; font-weight: 700; cursor: pointer; font-size: 14px; letter-spacing: 0.3px; }
-  .tab.active { background: #e30613; color: #fff; }
-  .card { background: #fff; border: 2px solid #000; }
-  .btn { border: none; padding: 11px 16px; font-weight: 700; cursor: pointer; font-size: 15px; background: #e30613; color: #fff; }
-  .btn.black { background: #000; color: #fff; }
-  .btn.ghost { background: #fff; color: #000; border: 2px solid #000; }
-  .btn.sm { padding: 8px 12px; font-size: 14px; font-weight: 600; }
-  .btn.ghost.sm { border: 1px solid #000; }
-  .btn.red-ghost { background: #fff; color: #e30613; border: 1.5px solid #e30613; padding: 8px 12px; font-size: 14px; font-weight: 600; }
-  input, select { font-size: 16px; padding: 10px 12px; border: 1px solid #000; background: #fff; outline: none; }
-  input:focus, select:focus { border-color: #e30613; }
-  .toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
-  .yearnav { display: flex; align-items: center; gap: 6px; background: #fff; border: 1px solid #000; padding: 4px; }
-  .yearnav button { border: none; background: transparent; width: 36px; height: 36px; cursor: pointer; font-size: 20px; color: #e30613; }
-  .yearnav .yr { font-weight: 700; min-width: 52px; text-align: center; font-size: 16px; }
-  .viewtoggle { display: flex; gap: 5px; background: #fff; border: 1px solid #000; padding: 4px; }
-  .viewtoggle button { border: none; background: transparent; padding: 8px 14px; font-size: 13px; font-weight: 700; color: #000; cursor: pointer; }
-  .viewtoggle button.active { background: #e30613; color: #fff; }
-  .legend { background: #fff; border: 2px solid #000; padding: 12px 16px; margin-bottom: 14px; }
-  .legend .items { display: flex; gap: 14px 24px; align-items: center; font-size: 12.5px; flex-wrap: wrap; font-weight: 600; line-height: 1.4; }
-  .legend .items span.li { display: inline-flex; align-items: center; gap: 7px; }
-  .chip { width: 18px; height: 18px; display: inline-block; border: 1px solid #000; flex-shrink: 0; }
-  .personbar { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
-  .personbar label { font-size: 12px; color: #6b6b6b; font-weight: 700; }
-  .personbar select { flex: 1; min-width: 180px; }
-  .cnt { font-size: 13px; font-weight: 700; padding: 5px 12px; }
-  .monthgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 22px; padding: 18px; }
-  .month { border: 2px solid #000; padding: 14px; background: #fff; }
-  .month h4 { font-size: 15px; margin: 0 0 12px; text-align: center; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; border-bottom: 2px solid #000; padding-bottom: 8px; }
-  .dow { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; margin-bottom: 5px; }
-  .days { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; }
-  .day { min-height: 38px; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; user-select: none; position: relative; border: 1px solid #000; font-weight: 500; background: #fff; }
-  .dow span { text-align: center; font-size: 11px; color: #6b6b6b; font-weight: 700; padding: 2px 0; }
+  body { font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif; color: var(--ink); background: var(--white); padding: 14px; font-weight: 500; }
+  .wrap { max-width: 1220px; margin: 0 auto; }
+  h1 { font-family: 'Caveat', cursive; font-size: 40px; margin: 0; display: flex; align-items: center; gap: 12px; color: var(--berry); font-weight: 700; }
+  header.top { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+  .vk2badge { background: var(--berry); color: #fff; font-size: 15px; padding: 6px 14px; font-weight: 700; letter-spacing: 2px; border-radius: 999px; box-shadow: var(--shadow); }
+  .tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .tab { flex: 1; min-width: 120px; padding: 12px 14px; border: none; background: var(--creme); color: var(--taupe-d); font-weight: 600; cursor: pointer; font-size: 15px; border-radius: var(--radius); box-shadow: var(--shadow); font-family: 'Quicksand'; }
+  .tab.active { background: var(--berry); color: #fff; }
+  .card { background: var(--white); border: 1.5px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+  .btn { border: none; padding: 11px 18px; font-weight: 600; cursor: pointer; font-size: 15px; background: var(--berry); color: #fff; border-radius: var(--radius-sm); font-family: 'Quicksand'; box-shadow: var(--shadow); }
+  .btn.taupe { background: var(--taupe); }
+  .btn.ghost { background: var(--creme); color: var(--ink); }
+  .btn.sm { padding: 8px 13px; font-size: 14px; }
+  .btn.red-ghost { background: var(--berry-bg); color: var(--berry); padding: 8px 13px; font-size: 14px; }
+  input, select { font-size: 16px; padding: 10px 13px; border: 1.5px solid var(--line); background: var(--white); outline: none; border-radius: var(--radius-sm); font-family: 'Quicksand'; color: var(--ink); }
+  input:focus, select:focus { border-color: var(--berry); }
+  .toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+  .yearnav { display: flex; align-items: center; gap: 6px; background: var(--creme); border-radius: var(--radius); padding: 5px; box-shadow: var(--shadow); }
+  .yearnav button { border: none; background: transparent; width: 38px; height: 38px; cursor: pointer; font-size: 22px; color: var(--berry); border-radius: var(--radius-sm); }
+  .yearnav .yr { font-weight: 700; min-width: 54px; text-align: center; font-size: 17px; }
+  .viewtoggle { display: flex; gap: 5px; background: var(--creme); border-radius: var(--radius); padding: 5px; box-shadow: var(--shadow); }
+  .viewtoggle button { border: none; background: transparent; padding: 9px 15px; font-size: 14px; font-weight: 600; color: var(--taupe-d); cursor: pointer; border-radius: var(--radius-sm); font-family: 'Quicksand'; }
+  .viewtoggle button.active { background: var(--berry); color: #fff; }
+  .legend { background: var(--creme); border-radius: var(--radius); padding: 14px 18px; margin-bottom: 16px; box-shadow: var(--shadow); }
+  .legend .items { display: flex; gap: 14px 26px; align-items: center; font-size: 13px; flex-wrap: wrap; font-weight: 600; line-height: 1.5; color: var(--taupe-d); }
+  .legend .items span.li { display: inline-flex; align-items: center; gap: 8px; }
+  .chip { width: 20px; height: 20px; display: inline-block; flex-shrink: 0; border-radius: 6px; }
+  .personbar { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+  .personbar label { font-size: 13px; color: var(--muted); font-weight: 600; }
+  .personbar select { flex: 1; min-width: 200px; }
+  .cnt { font-size: 13px; font-weight: 700; padding: 7px 14px; border-radius: 999px; }
+  .monthgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 22px; padding: 20px; }
+  .month { border: 1.5px solid var(--line); border-radius: var(--radius); padding: 16px; background: var(--white); box-shadow: var(--shadow); }
+  .month h4 { font-family: 'Caveat', cursive; font-size: 26px; margin: 0 0 12px; text-align: center; color: var(--berry); font-weight: 700; }
+  .mrow { display: grid; grid-template-columns: 30px repeat(7,1fr); gap: 5px; align-items: stretch; }
+  .dowrow { margin-bottom: 6px; }
+  .dowrow span { text-align: center; font-size: 11px; color: var(--muted); font-weight: 700; padding: 2px 0; display: flex; align-items: center; justify-content: center; }
+  .dowrow .kwhead { font-size: 10px; color: var(--taupe); }
+  .weekrow { margin-bottom: 5px; }
+  .kwcell { font-size: 11px; font-weight: 700; color: var(--taupe-d); display: flex; align-items: center; justify-content: center; border-radius: 6px; }
+  .day { min-height: 40px; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; user-select: none; position: relative; border: 1.5px solid var(--line); font-weight: 600; background: var(--white); border-radius: var(--radius-sm); }
   .day.empty { border: none; cursor: default; background: transparent; }
-  .day .rep { position: absolute; top: 1px; right: 2px; font-size: 9px; font-weight: 900; line-height: 1; }
-  .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  table.cal { border-collapse: collapse; width: 100%; font-size: 11px; }
-  table.cal th, table.cal td { border: 1px solid #000; text-align: center; padding: 0; }
-  table.cal th.nameh { position: sticky; left: 0; z-index: 3; background: #fff; text-align: left; padding: 8px 10px; min-width: 150px; font-size: 13px; }
-  table.cal thead th { background: #f2f2f2; padding: 4px 2px; font-weight: 600; color: #6b6b6b; font-size: 10px; }
-  table.cal thead th.mhead { font-size: 12px; color: #fff; background: #000; }
-  table.cal thead th.uhead { position: sticky; left: 150px; z-index: 3; background: #000; color: #fff; font-size: 11px; min-width: 62px; padding: 4px 6px; }
-  table.cal td.name { position: sticky; left: 0; z-index: 2; text-align: left; padding: 6px 10px; font-size: 13px; font-weight: 700; min-width: 150px; white-space: nowrap; }
-  table.cal td.name small { display: block; font-size: 10px; color: #6b6b6b; font-weight: 500; }
-  table.cal td.ucell { position: sticky; left: 150px; z-index: 2; text-align: center; font-size: 13px; font-weight: 700; min-width: 62px; background: #fff; }
-  .daycell { width: 20px; height: 30px; cursor: pointer; }
-  .emprow { display: flex; align-items: center; gap: 8px; padding: 11px 10px; flex-wrap: wrap; border-bottom: 1px solid #000; }
-  .emprow .nm { font-weight: 700; min-width: 120px; }
-  .badge { font-size: 11px; padding: 2px 8px; font-weight: 700; }
-  .badge.me { background: #e30613; color: #fff; letter-spacing: 0.5px; }
+  .day .rep { position: absolute; top: 2px; right: 3px; font-size: 9px; font-weight: 800; line-height: 1; }
+  .sprinkle { position: absolute; inset: -3px; border-radius: 13px; pointer-events: none; z-index: 3; }
+  .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: var(--radius); }
+  table.cal { border-collapse: separate; border-spacing: 0; width: 100%; font-size: 12px; }
+  table.cal th, table.cal td { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); text-align: center; padding: 0; }
+  table.cal thead th { background: var(--creme); padding: 8px 6px; font-weight: 700; color: var(--taupe-d); font-size: 12px; }
+  table.cal th.nameh { position: sticky; left: 0; z-index: 3; background: var(--creme); text-align: left; padding: 10px 12px; min-width: 170px; font-size: 13px; }
+  table.cal td.name { position: sticky; left: 0; z-index: 2; text-align: left; padding: 9px 12px; font-size: 13px; font-weight: 700; min-width: 170px; white-space: nowrap; background: var(--white); }
+  table.cal td.name small { display: block; font-size: 10px; color: var(--muted); font-weight: 600; }
+  table.cal td.ucell { position: sticky; left: 170px; z-index: 2; text-align: center; font-size: 13px; font-weight: 700; min-width: 66px; background: var(--white); }
+  table.cal th.uhead { position: sticky; left: 170px; z-index: 3; background: var(--creme); font-size: 12px; min-width: 66px; padding: 8px 6px; }
+  .kwcolcell { min-width: 40px; height: 38px; cursor: pointer; font-weight: 700; font-size: 12px; }
+  .emprow { display: flex; align-items: center; gap: 9px; padding: 13px 12px; flex-wrap: wrap; border-bottom: 1.5px solid var(--line); }
+  .emprow:last-child { border-bottom: none; }
+  .emprow .nm { font-weight: 700; min-width: 130px; font-size: 15px; }
+  .badge { font-size: 11px; padding: 3px 10px; font-weight: 700; border-radius: 999px; }
+  .badge.me { background: var(--berry); color: #fff; letter-spacing: 0.5px; }
   .badge.fach { color: #fff; }
-  .badge.outline { background: #fff; color: #000; border: 1.5px solid #000; padding: 1px 8px; }
-  .badge.grey { background: #e0e0e0; color: #000; }
-  .badge.black { background: #000; color: #fff; }
+  .badge.soft { background: var(--creme-2); color: var(--taupe-d); }
+  .badge.berry { background: var(--berry-bg); color: var(--berry); }
+  .badge.sage { background: #dde6d8; color: #5f7256; }
   .spacer { flex: 1; }
-  .bdaygrid { display: grid; grid-template-columns: repeat(auto-fill,minmax(240px,1fr)); gap: 10px; padding: 16px; }
-  .bcard { border: 1.5px solid #000; padding: 14px; display: flex; align-items: center; gap: 12px; background: #fff; }
-  .bcard.soon { border: 3px solid #e30613; background: #f7c6c9; }
-  .bcard .cake { font-size: 26px; }
+  .bdaygrid { display: grid; grid-template-columns: repeat(auto-fill,minmax(250px,1fr)); gap: 12px; padding: 18px; }
+  .bcard { border: 1.5px solid var(--line); border-radius: var(--radius); padding: 15px; display: flex; align-items: center; gap: 13px; background: var(--white); box-shadow: var(--shadow); }
+  .bcard.soon { border: 2.5px solid var(--berry); background: var(--berry-bg); }
+  .bcard .cake { font-size: 28px; }
   .bcard .bn { font-weight: 700; }
-  .bcard .bd { color: #6b6b6b; font-size: 13px; }
-  .sub { color: #6b6b6b; font-size: 13px; margin: 2px 0 14px; }
-  .hint { font-size: 12px; color: #6b6b6b; margin-top: 10px; line-height: 1.5; }
-  .empty { color: #6b6b6b; padding: 24px; text-align: center; line-height: 1.6; }
-  .modal-bg { position: fixed; inset: 0; background: rgba(15,23,42,0.45); display: flex; align-items: center; justify-content: center; z-index: 50; padding: 16px; }
-  .modal { background: #fff; padding: 22px; width: 100%; max-width: 380px; max-height: 90vh; overflow-y: auto; border: 2px solid #000; }
-  .modal h3 { margin: 0 0 14px; }
-  .modal .fields { display: flex; flex-direction: column; gap: 12px; margin-bottom: 18px; }
-  .modal label.lbl { font-size: 12px; color: #6b6b6b; font-weight: 700; display: block; margin-bottom: 5px; }
-  .modal .actions { display: flex; gap: 8px; justify-content: flex-end; }
-  .modal .chk { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 10px 12px; border: 1.5px solid #000; background: #fff; }
-  .modal .chk.on { background: #f7c6c9; }
-  .modal .chk input { width: 18px; height: 18px; }
+  .bcard .bd { color: var(--muted); font-size: 13px; }
+  .sub { color: var(--muted); font-size: 13px; margin: 2px 0 14px; }
+  .hint { font-size: 12px; color: var(--muted); margin-top: 12px; line-height: 1.6; }
+  .empty { color: var(--muted); padding: 28px; text-align: center; line-height: 1.7; }
+  .modal-bg { position: fixed; inset: 0; background: rgba(74,64,56,0.4); display: flex; align-items: center; justify-content: center; z-index: 50; padding: 16px; }
+  .modal { background: var(--white); padding: 24px; width: 100%; max-width: 420px; max-height: 92vh; overflow-y: auto; border-radius: var(--radius); box-shadow: var(--shadow-lg); }
+  .modal h3 { margin: 0 0 16px; font-family: 'Caveat'; font-size: 30px; color: var(--berry); }
+  .modal .fields { display: flex; flex-direction: column; gap: 13px; margin-bottom: 20px; }
+  .modal label.lbl { font-size: 12px; color: var(--muted); font-weight: 700; display: block; margin-bottom: 6px; }
+  .modal .actions { display: flex; gap: 9px; justify-content: flex-end; }
+  .modal .chk { display: flex; align-items: center; gap: 11px; cursor: pointer; padding: 11px 13px; border: 1.5px solid var(--line); background: var(--white); border-radius: var(--radius-sm); }
+  .modal .chk.on { background: var(--berry-bg); border-color: var(--berry-l); }
+  .modal .chk input { width: 19px; height: 19px; accent-color: var(--berry); }
   .modal input[type=text], .modal input[type=date], .modal select { width: 100%; }
-  .exportbox { margin-top: 24px; border-top: 2px solid #000; padding-top: 16px; }
-  .exportbox h3 { font-size: 15px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 6px; }
-  .exportrow { display: flex; gap: 10px; flex-wrap: wrap; }
+  .counter { display: flex; align-items: center; justify-content: space-between; padding: 10px 13px; border: 1.5px solid var(--line); border-radius: var(--radius-sm); gap: 10px; }
+  .counter .clabel { font-size: 14px; font-weight: 600; }
+  .counter .cctrl { display: flex; align-items: center; gap: 8px; }
+  .counter .cbtn { width: 32px; height: 32px; border: none; border-radius: 8px; background: var(--creme-2); color: var(--berry); font-size: 18px; font-weight: 700; cursor: pointer; line-height: 1; }
+  .counter .cnum { width: 46px; text-align: center; font-size: 15px; padding: 6px; }
+  .exportbox, .syncbox { margin-top: 22px; border-top: 1.5px solid var(--line); padding-top: 18px; }
+  .exportbox h3, .syncbox h3 { font-family: 'Caveat'; font-size: 26px; color: var(--berry); margin: 0 0 6px; }
+  .exportrow { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .syncstate { font-size: 12px; padding: 4px 10px; border-radius: 999px; font-weight: 700; }
+  .syncstate.on { background: #dde6d8; color: #5f7256; }
+  .syncstate.off { background: var(--creme-2); color: var(--muted); }
+  .syncfields { display: flex; flex-direction: column; gap: 10px; margin: 12px 0; max-width: 460px; }
   @media (max-width: 640px) {
-    h1 { font-size: 20px; }
-    .monthgrid { grid-template-columns: 1fr; padding: 12px; gap: 12px; }
+    h1 { font-size: 32px; }
+    .monthgrid { grid-template-columns: 1fr; padding: 14px; gap: 14px; }
     .day { font-size: 15px; }
   }
 </style>
 </head>
 <body>
 <div class="wrap" id="app"></div>
-
+<div id="modalRoot"></div>
 <script>
 "use strict";
-
 /* ====================== DATEN ====================== */
 var MONTHS = ["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];
 var MONTHS_FULL = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
@@ -122,73 +135,49 @@ var WD_MON = ["Mo","Di","Mi","Do","Fr","Sa","So"];
 var URLAUBS_LIMIT = 30;
 
 var FACHBEREICHE = ["Elektro","Eisenwaren","Sanitär"];
-var FACH_FARBE = { "Elektro":"#e30613", "Eisenwaren":"#9e9e9e", "Sanitär":"#000000" };
-var FACH_ROW = {
-  "Elektro":    { line:"#e30613" },
-  "Sanitär":    { line:"#000000" },
-  "Eisenwaren": { line:"#9e9e9e" }
-};
+var FACH_FARBE = { "Elektro":"#a86b7e", "Eisenwaren":"#b8a894", "Sanitär":"#8f8071" };
+var FACH_ROW = { "Elektro":"#a86b7e", "Sanitär":"#8f8071", "Eisenwaren":"#b8a894" };
 
 var COL = {
-  accent:"#e30613", ink:"#000000", weekend:"#dcdcdc", ferien:"#f4c400",
-  vorjahr:"#e0e0e0", over:"#e30613", overBg:"#f7c6c9"
+  berry:"#a86b7e", berryBg:"#f3e3e8", berryL:"#d9b8c1",
+  ink:"#4a4038", weekend:"#f0ebe3", ferien:"#e7d3a1", ferienD:"#c9ac6b",
+  vorjahr:"#efe7db", vorjahrLine:"#b8a894", over:"#a86b7e", overBg:"#f3e3e8",
+  taupe:"#b8a894", creme:"#f6f1ea", kwA:"#f6f1ea", kwB:"#ece3ef", line:"#e4d9ca",
+  today:"#a86b7e", muted:"#9a8d7f"
 };
 
-/* Ferien Hessen (Quelle: Hess. Kultusministerium) */
 var FERIEN = {
-  2025: [
-    {start:"2025-01-01", end:"2025-01-11"},
-    {start:"2025-04-07", end:"2025-04-21"},
-    {start:"2025-07-07", end:"2025-08-15"},
-    {start:"2025-10-06", end:"2025-10-18"},
-    {start:"2025-12-22", end:"2025-12-31"}
-  ],
-  2026: [
-    {start:"2026-01-01", end:"2026-01-10"},
-    {start:"2026-03-30", end:"2026-04-10"},
-    {start:"2026-06-29", end:"2026-08-07"},
-    {start:"2026-10-05", end:"2026-10-17"},
-    {start:"2026-12-23", end:"2026-12-31"}
-  ],
-  2027: [
-    {start:"2027-01-01", end:"2027-01-12"},
-    {start:"2027-03-22", end:"2027-04-02"},
-    {start:"2027-06-28", end:"2027-08-06"},
-    {start:"2027-10-04", end:"2027-10-16"},
-    {start:"2027-12-23", end:"2027-12-31"}
-  ],
-  2028: [
-    {start:"2028-01-01", end:"2028-01-11"}
-  ]
+  2025: [{start:"2025-01-01",end:"2025-01-11"},{start:"2025-04-07",end:"2025-04-21"},{start:"2025-07-07",end:"2025-08-15"},{start:"2025-10-06",end:"2025-10-18"},{start:"2025-12-22",end:"2025-12-31"}],
+  2026: [{start:"2026-01-01",end:"2026-01-10"},{start:"2026-03-30",end:"2026-04-10"},{start:"2026-06-29",end:"2026-08-07"},{start:"2026-10-05",end:"2026-10-17"},{start:"2026-12-23",end:"2026-12-31"}],
+  2027: [{start:"2027-01-01",end:"2027-01-12"},{start:"2027-03-22",end:"2027-04-02"},{start:"2027-06-28",end:"2027-08-06"},{start:"2027-10-04",end:"2027-10-16"},{start:"2027-12-23",end:"2027-12-31"}],
+  2028: [{start:"2028-01-01",end:"2028-01-11"}]
 };
-
-/* Gesetzliche Feiertage Hessen (Quelle: Hess. Innenministerium) */
 var FEIERTAGE = {
   2025: {"2025-01-01":"Neujahr","2025-04-18":"Karfreitag","2025-04-21":"Ostermontag","2025-05-01":"Tag der Arbeit","2025-05-29":"Christi Himmelfahrt","2025-06-09":"Pfingstmontag","2025-06-19":"Fronleichnam","2025-10-03":"Tag der Deutschen Einheit","2025-12-25":"1. Weihnachtsfeiertag","2025-12-26":"2. Weihnachtsfeiertag"},
   2026: {"2026-01-01":"Neujahr","2026-04-03":"Karfreitag","2026-04-06":"Ostermontag","2026-05-01":"Tag der Arbeit","2026-05-14":"Christi Himmelfahrt","2026-05-25":"Pfingstmontag","2026-06-04":"Fronleichnam","2026-10-03":"Tag der Deutschen Einheit","2026-12-25":"1. Weihnachtsfeiertag","2026-12-26":"2. Weihnachtsfeiertag"},
   2027: {"2027-01-01":"Neujahr","2027-03-26":"Karfreitag","2027-03-29":"Ostermontag","2027-05-01":"Tag der Arbeit","2027-05-06":"Christi Himmelfahrt","2027-05-17":"Pfingstmontag","2027-05-27":"Fronleichnam","2027-10-03":"Tag der Deutschen Einheit","2027-12-25":"1. Weihnachtsfeiertag","2027-12-26":"2. Weihnachtsfeiertag"}
 };
 
-function mk(id, name, opts) {
-  var e = { id:id, name:name, me:false, birthday:"", urlaub:[], azubi:false, schulkinder:false, pflege:false, teilzeit:false, vollzeit:false, fach:"" };
-  for (var k in opts) e[k] = opts[k];
+function mk(id,name,opts){
+  var e={id:id,name:name,me:false,birthday:"",urlaub:[],azubi:false,teilzeit:false,vollzeit:false,fach:"",kinder:0,pflege:0,betriebsrat:0};
+  for(var k in opts) e[k]=opts[k];
   return e;
 }
 var DEFAULT_EMP = [
-  { id:"me", name:"Jennifer Hebling (VK2-Leitung)", me:true, birthday:"", urlaub:[], azubi:false, schulkinder:false, pflege:false, teilzeit:false, vollzeit:true, fach:"" },
-  mk("e1","Amy Lee",{azubi:true, fach:"Elektro"}),
-  mk("e3","Philipp Warkus",{azubi:true, fach:"Sanitär"}),
-  mk("e9","Christian Beck",{vollzeit:true, fach:"Eisenwaren"}),
-  mk("e8","Ralf Weigel",{vollzeit:true, fach:"Eisenwaren"}),
-  mk("e2","Birgit Trüller",{teilzeit:true, fach:"Elektro"}),
-  mk("e10","Lin Berisha",{teilzeit:true, fach:"Elektro"}),
-  mk("e11","Lisa Freund",{vollzeit:true, fach:"Elektro"}),
-  mk("e7","Marius Kolja Rieger",{vollzeit:true, fach:"Elektro"}),
-  mk("e5","Irene Heilmann",{vollzeit:true, fach:"Sanitär"}),
-  mk("e6","Karin Kuhl",{teilzeit:true, fach:"Sanitär"}),
-  mk("e4","Michael Gössl",{vollzeit:true, fach:"Sanitär"}),
-  mk("e13","Monika Peters",{vollzeit:true, fach:"Sanitär"}),
-  mk("e12","Stefan Lautenschläger",{vollzeit:true, fach:"Sanitär"})
+  { id:"me", name:"Jennifer Hebling (VK2-Leitung)", me:true, birthday:"", urlaub:[], azubi:false, teilzeit:false, vollzeit:true, fach:"", kinder:0, pflege:0, betriebsrat:0 },
+  mk("e1","Amy Lee",{azubi:true,fach:"Elektro"}),
+  mk("e3","Philipp Warkus",{azubi:true,fach:"Sanitär"}),
+  mk("e9","Christian Beck",{vollzeit:true,fach:"Eisenwaren"}),
+  mk("e8","Ralf Weigel",{vollzeit:true,fach:"Eisenwaren"}),
+  mk("e2","Birgit Trüller",{teilzeit:true,fach:"Elektro"}),
+  mk("e10","Lin Berisha",{teilzeit:true,fach:"Elektro"}),
+  mk("e11","Lisa Freund",{vollzeit:true,fach:"Elektro"}),
+  mk("e7","Marius Kolja Rieger",{vollzeit:true,fach:"Elektro"}),
+  mk("e5","Irene Heilmann",{vollzeit:true,fach:"Sanitär"}),
+  mk("e6","Karin Kuhl",{teilzeit:true,fach:"Sanitär"}),
+  mk("e4","Michael Gössl",{vollzeit:true,fach:"Sanitär"}),
+  mk("e13","Monika Peters",{vollzeit:true,fach:"Sanitär"}),
+  mk("e12","Stefan Lautenschläger",{vollzeit:true,fach:"Sanitär"})
 ];
 
 /* ====================== HILFSFUNKTIONEN ====================== */
@@ -197,122 +186,183 @@ function iso(y,m,d){ return y+"-"+pad(m+1)+"-"+pad(d); }
 function daysInMonth(y,m){ return new Date(y,m+1,0).getDate(); }
 function todayISO(){ var t=new Date(); return iso(t.getFullYear(),t.getMonth(),t.getDate()); }
 
+/* ISO-Kalenderwoche für ein Datum */
+function isoWeek(y,m,d){
+  var date = new Date(Date.UTC(y,m,d));
+  var day = (date.getUTCDay()+6)%7;      // Mo=0..So=6
+  date.setUTCDate(date.getUTCDate()-day+3); // Donnerstag dieser Woche
+  var firstThu = new Date(Date.UTC(date.getUTCFullYear(),0,4));
+  var fday = (firstThu.getUTCDay()+6)%7;
+  firstThu.setUTCDate(firstThu.getUTCDate()-fday+3);
+  var week = 1 + Math.round((date-firstThu)/(7*24*3600*1000));
+  return week;
+}
+function isoWeekFromISO(ds){ var p=ds.split("-"); return isoWeek(+p[0],+p[1]-1,+p[2]); }
+
 function ferienDaysSet(year){
-  var set = {};
-  var list = FERIEN[year] || [];
-  for (var i=0;i<list.length;i++){
-    var d = new Date(list[i].start), end = new Date(list[i].end);
-    while (d <= end){ set[iso(d.getFullYear(),d.getMonth(),d.getDate())] = true; d.setDate(d.getDate()+1); }
+  var set={}; var list=FERIEN[year]||[];
+  for(var i=0;i<list.length;i++){
+    var d=new Date(list[i].start), end=new Date(list[i].end);
+    while(d<=end){ set[iso(d.getFullYear(),d.getMonth(),d.getDate())]=true; d.setDate(d.getDate()+1); }
   }
   return set;
 }
-function feiertagName(ds){
-  var y = parseInt(ds.slice(0,4),10);
-  var f = FEIERTAGE[y] || {};
-  return f[ds] || null;
-}
-function priorYearMMDD(emp, year){
-  var set = {};
-  var u = emp.urlaub || [];
-  for (var i=0;i<u.length;i++){
-    var y = parseInt(u[i].slice(0,4),10);
-    if (y < year) set[u[i].slice(5)] = true;
-  }
+function feiertagName(ds){ var y=parseInt(ds.slice(0,4),10); var f=FEIERTAGE[y]||{}; return f[ds]||null; }
+function priorYearMMDD(emp,year){
+  var set={}; var u=emp.urlaub||[];
+  for(var i=0;i<u.length;i++){ var y=parseInt(u[i].slice(0,4),10); if(y<year) set[u[i].slice(5)]=true; }
   return set;
 }
 function fmtBday(b){
-  var p = b.split("-");
-  if (p.length===3) return parseInt(p[2],10)+". "+MONTHS_FULL[parseInt(p[1],10)-1];
-  if (p.length===2) return parseInt(p[1],10)+". "+MONTHS_FULL[parseInt(p[0],10)-1];
+  var p=b.split("-");
+  if(p.length===3) return parseInt(p[2],10)+". "+MONTHS_FULL[parseInt(p[1],10)-1];
+  if(p.length===2) return parseInt(p[1],10)+". "+MONTHS_FULL[parseInt(p[0],10)-1];
   return b;
 }
-function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
-
-/* ====================== SPEICHER (localStorage) ====================== */
-var KEY = "vk2:data";
-function loadData(){
-  try { var raw = localStorage.getItem(KEY); if (raw) return JSON.parse(raw); } catch(e){}
+function bdayMMDD(b){
+  if(!b) return null;
+  var p=b.split("-");
+  if(p.length===3) return p[1]+"-"+p[2];
+  if(p.length===2) return p[0]+"-"+p[1];
   return null;
 }
-function saveData(){
-  try { localStorage.setItem(KEY, JSON.stringify(STATE.data)); } catch(e){}
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+/* ====================== SPEICHER: lokal + Cloud (JSONBin) ====================== */
+var KEY = "vk2:data";
+var CFGKEY = "vk2:sync";
+
+function loadLocal(){ try{ var r=localStorage.getItem(KEY); if(r) return JSON.parse(r); }catch(e){} return null; }
+function saveLocal(){ try{ localStorage.setItem(KEY, JSON.stringify(STATE.data)); }catch(e){} }
+
+function loadSyncCfg(){ try{ var r=localStorage.getItem(CFGKEY); if(r) return JSON.parse(r); }catch(e){} return { apiKey:"", binId:"" }; }
+function saveSyncCfg(cfg){ try{ localStorage.setItem(CFGKEY, JSON.stringify(cfg)); }catch(e){} }
+
+var SYNC = loadSyncCfg();
+var SYNC_STATUS = "off"; // off | ok | error | saving | loading
+var pushTimer = null;
+
+function syncEnabled(){ return !!(SYNC.apiKey && SYNC.binId); }
+
+/* Von Cloud laden */
+function cloudLoad(cb){
+  if(!syncEnabled()){ cb(null); return; }
+  SYNC_STATUS="loading";
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET","https://api.jsonbin.io/v3/b/"+encodeURIComponent(SYNC.binId)+"/latest",true);
+  xhr.setRequestHeader("X-Master-Key", SYNC.apiKey);
+  xhr.onload = function(){
+    if(xhr.status>=200 && xhr.status<300){
+      try{
+        var res = JSON.parse(xhr.responseText);
+        var rec = res.record;
+        SYNC_STATUS="ok";
+        cb(rec && rec.employees ? rec : null);
+      }catch(e){ SYNC_STATUS="error"; cb(null); }
+    } else { SYNC_STATUS="error"; cb(null); }
+    if(STATE.tab==="team") render();
+  };
+  xhr.onerror = function(){ SYNC_STATUS="error"; cb(null); if(STATE.tab==="team") render(); };
+  xhr.send();
 }
+/* In Cloud speichern (entprellt) */
+function cloudPushSoon(){
+  if(!syncEnabled()) return;
+  if(pushTimer) clearTimeout(pushTimer);
+  pushTimer = setTimeout(cloudPushNow, 900);
+}
+function cloudPushNow(){
+  if(!syncEnabled()) return;
+  SYNC_STATUS="saving"; if(STATE.tab==="team") render();
+  var xhr = new XMLHttpRequest();
+  xhr.open("PUT","https://api.jsonbin.io/v3/b/"+encodeURIComponent(SYNC.binId),true);
+  xhr.setRequestHeader("Content-Type","application/json");
+  xhr.setRequestHeader("X-Master-Key", SYNC.apiKey);
+  xhr.onload = function(){
+    SYNC_STATUS = (xhr.status>=200 && xhr.status<300) ? "ok" : "error";
+    if(STATE.tab==="team") render();
+  };
+  xhr.onerror = function(){ SYNC_STATUS="error"; if(STATE.tab==="team") render(); };
+  xhr.send(JSON.stringify(STATE.data));
+}
+
+/* Zentrales Speichern: lokal sofort, Cloud entprellt */
+function saveData(){ saveLocal(); cloudPushSoon(); }
+
 function exportToFile(){
-  var blob = new Blob([JSON.stringify(STATE.data, null, 2)], {type:"application/json"});
-  var url = URL.createObjectURL(blob);
-  var a = document.createElement("a");
-  var d = new Date();
-  var stamp = d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
-  a.href = url; a.download = "vk2-urlaubsboard-"+stamp+".json";
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  var blob=new Blob([JSON.stringify(STATE.data,null,2)],{type:"application/json"});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement("a"); var d=new Date();
+  a.href=url; a.download="vk2-urlaubsboard-"+d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())+".json";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
 }
 
 /* ====================== STATE ====================== */
-var STATE = {
-  data: null,
-  tab: "plan",
-  year: 2026,
-  view: "month",
-  selPerson: "me",
-  editId: null
-};
+var STATE = { data:null, tab:"plan", year:2026, view:"month", selPerson:"me" };
+var FERSETS = {};
+var TODAY = todayISO();
 
+var LAYOUT_VERSION = 5;
+function normalizeEmp(e){
+  if(typeof e.kinder!=="number") e.kinder=0;
+  if(typeof e.pflege!=="number") e.pflege = (e.pflege===true?1:(typeof e.pflege==="number"?e.pflege:0));
+  if(typeof e.betriebsrat!=="number") e.betriebsrat=0;
+  if(!("azubi" in e)) e.azubi=false;
+  if(!("teilzeit" in e)) e.teilzeit=false;
+  if(!("vollzeit" in e)) e.vollzeit=false;
+  if(!("fach" in e)) e.fach="";
+  if(!e.urlaub) e.urlaub=[];
+  return e;
+}
+function applyData(d){
+  for(var i=0;i<d.employees.length;i++) normalizeEmp(d.employees[i]);
+  STATE.data=d;
+}
 function initData(){
-  var d = loadData();
-  var LAYOUT_VERSION = 4;
-  if (!d){
-    d = { employees: DEFAULT_EMP.slice(), layout: LAYOUT_VERSION };
-    STATE.data = d; saveData();
+  var d=loadLocal();
+  if(!d){
+    d={employees:DEFAULT_EMP.slice(),layout:LAYOUT_VERSION};
+    applyData(d); saveLocal();
   } else {
-    var hatPlatzhalter = false, i;
-    for (i=0;i<d.employees.length;i++){
-      if (/^Mitarbeiter \d+$/.test(d.employees[i].name)) hatPlatzhalter = true;
-      if (d.employees[i].me && d.employees[i].name === "Ich (VK2-Leitung)") hatPlatzhalter = true;
+    var hatPlatzhalter=false,i;
+    for(i=0;i<d.employees.length;i++){
+      if(/^Mitarbeiter \d+$/.test(d.employees[i].name)) hatPlatzhalter=true;
+      if(d.employees[i].me && d.employees[i].name==="Ich (VK2-Leitung)") hatPlatzhalter=true;
     }
-    if (hatPlatzhalter || (d.layout||0) < LAYOUT_VERSION){
-      var neu = [];
-      for (i=0;i<DEFAULT_EMP.length;i++){
-        var def = DEFAULT_EMP[i], alt = null;
-        for (var j=0;j<d.employees.length;j++){ if (d.employees[j].id === def.id){ alt = d.employees[j]; break; } }
-        if (alt){
-          var copy = {}; for (var k in def) copy[k] = def[k];
-          copy.urlaub = alt.urlaub || []; copy.birthday = alt.birthday || "";
-          neu.push(copy);
-        } else neu.push(def);
+    if(hatPlatzhalter || (d.layout||0)<LAYOUT_VERSION){
+      var neu=[];
+      for(i=0;i<DEFAULT_EMP.length;i++){
+        var def=DEFAULT_EMP[i],alt=null;
+        for(var j=0;j<d.employees.length;j++){ if(d.employees[j].id===def.id){ alt=d.employees[j]; break; } }
+        if(alt){ var c={}; for(var k in def) c[k]=def[k]; c.urlaub=alt.urlaub||[]; c.birthday=alt.birthday||""; if(typeof alt.kinder==="number")c.kinder=alt.kinder; if(typeof alt.betriebsrat==="number")c.betriebsrat=alt.betriebsrat; if(typeof alt.pflege==="number")c.pflege=alt.pflege; neu.push(c); }
+        else neu.push(def);
       }
-      d.employees = neu; d.layout = LAYOUT_VERSION;
-      STATE.data = d; saveData();
-    } else {
-      STATE.data = d;
-    }
+      d.employees=neu; d.layout=LAYOUT_VERSION;
+      applyData(d); saveLocal();
+    } else { applyData(d); }
   }
 }
-
 /* ====================== AKTIONEN ====================== */
-function toggleDay(empId, ds){
-  if (feiertagName(ds)) return;
-  var emps = STATE.data.employees;
-  for (var i=0;i<emps.length;i++){
-    if (emps[i].id === empId){
-      var idx = emps[i].urlaub.indexOf(ds);
-      if (idx >= 0) emps[i].urlaub.splice(idx,1);
-      else emps[i].urlaub.push(ds);
+function toggleDay(empId,ds){
+  if(feiertagName(ds)) return;
+  var emps=STATE.data.employees;
+  for(var i=0;i<emps.length;i++){
+    if(emps[i].id===empId){
+      var idx=emps[i].urlaub.indexOf(ds);
+      if(idx>=0) emps[i].urlaub.splice(idx,1); else emps[i].urlaub.push(ds);
       break;
     }
   }
-  saveData();
-  render();
+  saveData(); render();
 }
-function zaehleUrlaub(emp, year){
-  var n = 0, u = emp.urlaub;
-  for (var i=0;i<u.length;i++){
-    var ds = u[i];
-    if (ds.slice(0,4) !== String(year)) continue;
-    var p = ds.split("-");
-    var dow = new Date(+p[0], +p[1]-1, +p[2]).getDay();
-    if (dow===0 || dow===6) continue;
-    if (feiertagName(ds)) continue;
+function zaehleUrlaub(emp,year){
+  var n=0,u=emp.urlaub;
+  for(var i=0;i<u.length;i++){
+    var ds=u[i];
+    if(ds.slice(0,4)!==String(year)) continue;
+    var p=ds.split("-");
+    var dow=new Date(+p[0],+p[1]-1,+p[2]).getDay();
+    if(dow===0||dow===6) continue;
+    if(feiertagName(ds)) continue;
     n++;
   }
   return n;
@@ -320,416 +370,430 @@ function zaehleUrlaub(emp, year){
 
 /* ====================== RENDER ====================== */
 function render(){
-  var app = document.getElementById("app");
-  var h = "";
-  h += '<header class="top"><h1><span class="vk2badge">VK2</span> Urlaubsboard</h1></header>';
-  h += '<div class="tabs">';
-  h += tabBtn("plan","Urlaubsplan");
-  h += tabBtn("team","Mitarbeiter");
-  h += tabBtn("bday","Geburtstage");
-  h += '</div>';
-
-  if (STATE.tab === "plan") h += renderPlan();
-  else if (STATE.tab === "team") h += renderTeam();
-  else if (STATE.tab === "bday") h += renderBday();
-
-  app.innerHTML = h;
+  var app=document.getElementById("app");
+  var h="";
+  h+='<header class="top"><h1><span class="vk2badge">VK2</span> Urlaubsboard</h1></header>';
+  h+='<div class="tabs">'+tabBtn("plan","Urlaubsplan")+tabBtn("team","Mitarbeiter")+tabBtn("bday","Geburtstage")+'</div>';
+  if(STATE.tab==="plan") h+=renderPlan();
+  else if(STATE.tab==="team") h+=renderTeam();
+  else if(STATE.tab==="bday") h+=renderBday();
+  app.innerHTML=h;
   bindEvents();
 }
+function tabBtn(id,label){ return '<button class="tab'+(STATE.tab===id?' active':'')+'" data-tab="'+id+'">'+label+'</button>'; }
 
-function tabBtn(id,label){
-  return '<button class="tab'+(STATE.tab===id?' active':'')+'" data-tab="'+id+'">'+label+'</button>';
+function sprinkleSvg(){
+  // bunte Zuckerstreusel als SVG-Umrandung (dünne bunte Striche rund um die Zelle)
+  var cols=["#e79cb0","#f2cf8a","#a7c8b0","#b39ddb","#efa98a","#8fc9d6"];
+  var lines="";
+  var n=22;
+  for(var i=0;i<n;i++){
+    var ang=(i/n)*2*Math.PI;
+    var cx=20+16*Math.cos(ang), cy=20+16*Math.sin(ang);
+    var rot=(ang*180/Math.PI)+ (i%2?35:-20);
+    var col=cols[i%cols.length];
+    lines+='<rect x="'+(cx-2.4)+'" y="'+(cy-0.9)+'" width="4.8" height="1.8" rx="0.9" fill="'+col+'" transform="rotate('+rot+' '+cx+' '+cy+')"/>';
+  }
+  return '<svg class="sprinkle" viewBox="0 0 40 40" preserveAspectRatio="none">'+lines+'</svg>';
 }
 
-function legendHtml(){
+function legendHtml(showKW){
   function chip(style){ return '<span class="chip" style="'+style+'"></span>'; }
-  var stripe = "background-image:repeating-linear-gradient(45deg,"+COL.accent+","+COL.accent+" 3px,#000 3px,#000 5px);";
-  var h = '<div class="legend"><div class="items">';
-  h += '<span class="li">'+chip("background:"+COL.accent+";")+' Urlaub</span>';
-  h += '<span class="li">'+chip("background:#000;")+' Feiertag</span>';
-  h += '<span class="li">'+chip("background:"+COL.ferien+";")+' Ferien Hessen</span>';
-  h += '<span class="li">'+chip("background:"+COL.weekend+";")+' Wochenende</span>';
-  h += '<span class="li">'+chip("background:"+COL.vorjahr+";box-shadow:inset 0 0 0 3px #000;")+' wie Vorjahr</span>';
-  h += '<span class="li">'+chip(stripe)+' Überschneidung</span>';
-  h += '<span class="li">'+chip(stripe+"box-shadow:inset 0 0 0 3px #000;")+' Überschn. + Vorjahr</span>';
-  h += '<span class="li">'+chip("background:#fff;border:3px solid "+COL.accent+";")+' Heute</span>';
-  h += '</div></div>';
+  var stripe="background-image:repeating-linear-gradient(45deg,"+COL.berry+","+COL.berry+" 3px,#fff 3px,#fff 6px);";
+  var h='<div class="legend"><div class="items">';
+  h+='<span class="li">'+chip("background:"+COL.berry+";")+' Urlaub</span>';
+  h+='<span class="li">'+chip("background:#4a4038;")+' Feiertag</span>';
+  h+='<span class="li">'+chip("background:"+COL.ferien+";")+' Ferien Hessen</span>';
+  h+='<span class="li">'+chip("background:"+COL.weekend+";")+' Wochenende</span>';
+  h+='<span class="li">'+chip("background:"+COL.vorjahr+";box-shadow:inset 0 0 0 3px "+COL.vorjahrLine+";")+' wie Vorjahr</span>';
+  h+='<span class="li">'+chip(stripe)+' Überschneidung</span>';
+  if(showKW) h+='<span class="li">'+chip("background:linear-gradient(90deg,"+COL.kwA+" 50%,"+COL.kwB+" 50%);")+' Kalenderwochen</span>';
+  h+='<span class="li"><span class="chip" style="position:relative;overflow:visible;background:#fff;">'+sprinkleSvg()+'</span> Geburtstag</span>';
+  h+='<span class="li">'+chip("background:#fff;border:3px solid "+COL.today+";")+' Heute</span>';
+  h+='</div></div>';
   return h;
 }
 
 function renderPlan(){
-  var h = "";
-  h += '<div class="toolbar">';
-  h += '<div class="yearnav"><button data-year="-1">‹</button><span class="yr">'+STATE.year+'</span><button data-year="1">›</button></div>';
-  h += '<div class="viewtoggle">';
-  h += '<button class="'+(STATE.view==="month"?"active":"")+'" data-view="month">Monatsansicht</button>';
-  h += '<button class="'+(STATE.view==="table"?"active":"")+'" data-view="table">Team-Übersicht</button>';
-  h += '</div></div>';
-  h += legendHtml();
-
-  var emps = STATE.data.employees;
-  if (STATE.view === "month"){
-    var person = null;
-    for (var i=0;i<emps.length;i++){ if (emps[i].id===STATE.selPerson){ person = emps[i]; break; } }
-    if (!person) person = emps[0];
-    var used = zaehleUrlaub(person, STATE.year);
-    var rest = URLAUBS_LIMIT - used;
-    var over = used > URLAUBS_LIMIT;
-
-    h += '<div class="personbar"><label>Person:</label><select id="selPerson">';
-    for (var j=0;j<emps.length;j++){
-      h += '<option value="'+emps[j].id+'"'+(emps[j].id===person.id?' selected':'')+'>'+esc(emps[j].name)+'</option>';
-    }
-    h += '</select>';
-    var cntStyle = over ? "background:"+COL.over+";color:#fff;" : (rest<=3 ? "background:"+COL.overBg+";color:"+COL.over+";" : "background:"+COL.weekend+";color:#000;");
-    h += '<span class="cnt" style="'+cntStyle+'">'+used+' / '+URLAUBS_LIMIT+' Urlaubstage '+(over?('· '+(used-URLAUBS_LIMIT)+' zu viel!'):('· '+rest+' übrig'))+'</span>';
-
-    var prior = priorYearMMDD(person, STATE.year);
-    var rep = 0;
-    for (var r=0;r<person.urlaub.length;r++){ var du=person.urlaub[r]; if (du.slice(0,4)===String(STATE.year) && prior[du.slice(5)]) rep++; }
-    if (rep>0) h += '<span class="cnt" style="background:'+COL.vorjahr+';color:#000;box-shadow:inset 0 0 0 2px #000;">↻ '+rep+' '+(rep===1?'Tag':'Tage')+' wie im Vorjahr</span>';
-    h += '</div>';
-
-    h += '<div class="card"><div class="monthgrid">';
-    for (var m=0;m<12;m++) h += monthCardHtml(person, m, prior);
-    h += '</div></div>';
-    h += '<p class="hint">Tipp: Tag antippen = Urlaub setzen oder löschen. Oben die Person umschalten. Deine Daten liegen lokal auf diesem Gerät.</p>';
+  var h="";
+  h+='<div class="toolbar">';
+  h+='<div class="yearnav"><button data-year="-1">‹</button><span class="yr">'+STATE.year+'</span><button data-year="1">›</button></div>';
+  h+='<div class="viewtoggle"><button class="'+(STATE.view==="month"?"active":"")+'" data-view="month">Monatsansicht</button><button class="'+(STATE.view==="table"?"active":"")+'" data-view="table">Team-Übersicht</button></div>';
+  h+='</div>';
+  h+=legendHtml(true);
+  var emps=STATE.data.employees;
+  if(STATE.view==="month"){
+    var person=null;
+    for(var i=0;i<emps.length;i++){ if(emps[i].id===STATE.selPerson){ person=emps[i]; break; } }
+    if(!person) person=emps[0];
+    var used=zaehleUrlaub(person,STATE.year), rest=URLAUBS_LIMIT-used, over=used>URLAUBS_LIMIT;
+    h+='<div class="personbar"><label>Person:</label><select id="selPerson">';
+    for(var j=0;j<emps.length;j++) h+='<option value="'+emps[j].id+'"'+(emps[j].id===person.id?' selected':'')+'>'+esc(emps[j].name)+'</option>';
+    h+='</select>';
+    var cs = over ? "background:"+COL.over+";color:#fff;" : (rest<=3?"background:"+COL.overBg+";color:"+COL.over+";":"background:"+COL.creme+";color:"+COL.ink+";");
+    h+='<span class="cnt" style="'+cs+'">'+used+' / '+URLAUBS_LIMIT+' Urlaubstage '+(over?('· '+(used-URLAUBS_LIMIT)+' zu viel!'):('· '+rest+' übrig'))+'</span>';
+    var prior=priorYearMMDD(person,STATE.year),rep=0;
+    for(var r=0;r<person.urlaub.length;r++){ var du=person.urlaub[r]; if(du.slice(0,4)===String(STATE.year)&&prior[du.slice(5)]) rep++; }
+    if(rep>0) h+='<span class="cnt" style="background:'+COL.vorjahr+';color:'+COL.ink+';box-shadow:inset 0 0 0 2px '+COL.vorjahrLine+';">↻ '+rep+' '+(rep===1?'Tag':'Tage')+' wie im Vorjahr</span>';
+    h+='</div>';
+    h+='<div class="card"><div class="monthgrid">';
+    for(var m=0;m<12;m++) h+=monthCardHtml(person,m,prior);
+    h+='</div></div>';
+    h+='<p class="hint">Tipp: Tag antippen = Urlaub setzen oder löschen. Links stehen die Kalenderwochen (KW). Geburtstage sind mit bunten Streuseln umrandet.</p>';
   } else {
-    h += '<div class="card scroll">'+tableHtml()+'</div>';
-    h += '<p class="hint">Ganzes Team auf einen Blick. Auf dem Handy seitlich wischen. Ferien Hessen (Kultusministerium) sind gelb hinterlegt.</p>';
+    h+='<div class="card scroll">'+tableHtml()+'</div>';
+    h+='<p class="hint">Team-Übersicht nach Kalenderwochen. Auf dem Handy seitlich wischen. Ferien Hessen sind einheitlich hinterlegt.</p>';
   }
   return h;
 }
+function monthCardHtml(person,month,prior){
+  var year=STATE.year;
+  var ferSet=FERSETS[year]||(FERSETS[year]=ferienDaysSet(year));
+  var today=TODAY;
+  var dim=daysInMonth(year,month);
+  var firstDow=(new Date(year,month,1).getDay()+6)%7;
+  var bdayMap = bdayMMDD(person.birthday);
 
-function monthCardHtml(person, month, prior){
-  var year = STATE.year;
-  var ferSet = FERSETS[year] || (FERSETS[year] = ferienDaysSet(year));
-  var today = TODAY;
-  var dim = daysInMonth(year, month);
-  var firstDow = (new Date(year, month, 1).getDay() + 6) % 7;
-  var h = '<div class="month"><h4>'+MONTHS_FULL[month]+'</h4><div class="dow">';
-  for (var w=0;w<7;w++) h += '<span>'+WD_MON[w]+'</span>';
-  h += '</div><div class="days">';
-  for (var i=0;i<firstDow;i++) h += '<div class="day empty"></div>';
-  for (var d=1;d<=dim;d++){
-    var ds = iso(year, month, d);
-    var dow = new Date(year, month, d).getDay();
-    var isWe = (dow===0 || dow===6);
-    var isFer = !!ferSet[ds];
-    var ftName = feiertagName(ds);
-    var isUrl = person.urlaub.indexOf(ds) >= 0;
-    var isRepeat = isUrl && !!prior[ds.slice(5)];
-    var isTod = (ds===today);
+  var h='<div class="month"><h4>'+MONTHS_FULL[month]+'</h4>';
+  // Kopfzeile: KW + Wochentage
+  h+='<div class="mrow dowrow"><span class="kwhead">KW</span>';
+  for(var w=0;w<7;w++) h+='<span>'+WD_MON[w]+'</span>';
+  h+='</div>';
 
-    var bg = "#fff", color = "#000", fw = "500";
-    if (isWe){ bg = COL.weekend; color = "#6b6b6b"; }
-    if (isFer){ bg = COL.ferien; color = "#000"; }
-    if (ftName){ bg = "#000"; color = "#fff"; fw = "800"; }
-    if (isUrl){ bg = COL.accent; color = "#fff"; fw = "800"; }
-    if (isRepeat){ bg = COL.vorjahr; color = "#000"; fw = "800"; }
-    var style = "background:"+bg+";color:"+color+";font-weight:"+fw+";";
-    if (isTod) style += "border:3px solid "+COL.accent+";";
-    if (isRepeat) style += "box-shadow:inset 0 0 0 3px #000;";
-    if (isFer && isUrl && !isRepeat) style += "background-image:repeating-linear-gradient(45deg,"+COL.accent+","+COL.accent+" 6px,"+COL.ferien+" 6px,"+COL.ferien+" 12px);";
-    var title = ftName ? ftName : (isRepeat ? "Selber Tag wie im Vorjahr" : "");
-    h += '<div class="day" data-day="'+ds+'" data-person="'+person.id+'" style="'+style+'" title="'+esc(title)+'">'+d+(isRepeat?'<span class="rep" style="color:#000;">↻</span>':'')+'</div>';
+  // Zellen in Wochenzeilen aufbauen (jeweils 7 Spalten, links KW)
+  var cells=[];
+  for(var e=0;e<firstDow;e++) cells.push(null);
+  for(var d=1;d<=dim;d++) cells.push(d);
+  while(cells.length%7!==0) cells.push(null);
+
+  for(var wk=0;wk<cells.length/7;wk++){
+    // KW aus dem ersten realen Tag der Zeile bestimmen
+    var kw="", kwColor="";
+    for(var c=0;c<7;c++){ var dd=cells[wk*7+c]; if(dd!==null){ kw=isoWeek(year,month,dd); break; } }
+    if(kw!==""){ kwColor = (kw%2===0)?COL.kwA:COL.kwB; }
+    h+='<div class="mrow weekrow">';
+    h+='<div class="kwcell" style="background:'+(kwColor||"transparent")+';">'+(kw!==""?kw:"")+'</div>';
+    for(var cc=0;cc<7;cc++){
+      var day=cells[wk*7+cc];
+      if(day===null){ h+='<div class="day empty"></div>'; continue; }
+      var ds=iso(year,month,day);
+      var dow=new Date(year,month,day).getDay();
+      var isWe=(dow===0||dow===6);
+      var isFer=!!ferSet[ds];
+      var ftName=feiertagName(ds);
+      var isUrl=person.urlaub.indexOf(ds)>=0;
+      var isRepeat=isUrl && !!prior[ds.slice(5)];
+      var isTod=(ds===today);
+      var isBday = bdayMap && (ds.slice(5)===bdayMap);
+
+      var bg="#fff",color=COL.ink,fw="600";
+      if(isWe){ bg=COL.weekend; color=COL.muted||"#9a8d7f"; }
+      if(isFer){ bg=COL.ferien; color=COL.ink; }
+      if(ftName){ bg="#4a4038"; color="#fff"; fw="700"; }
+      if(isUrl){ bg=COL.berry; color="#fff"; fw="700"; }
+      if(isRepeat){ bg=COL.vorjahr; color=COL.ink; fw="700"; }
+      var style="background:"+bg+";color:"+color+";font-weight:"+fw+";";
+      if(isTod) style+="border:3px solid "+COL.today+";";
+      if(isRepeat) style+="box-shadow:inset 0 0 0 3px "+COL.vorjahrLine+";";
+      if(isFer&&isUrl&&!isRepeat) style+="background-image:repeating-linear-gradient(45deg,"+COL.berry+","+COL.berry+" 6px,"+COL.ferien+" 6px,"+COL.ferien+" 12px);";
+      var cls="day"+(isBday?" hasbday":"");
+      var title=ftName?ftName:(isBday?"Geburtstag":(isRepeat?"Selber Tag wie im Vorjahr":""));
+      h+='<div class="'+cls+'" data-day="'+ds+'" data-person="'+person.id+'" style="'+style+'" title="'+esc(title)+'">'+day+(isRepeat?'<span class="rep" style="color:'+COL.taupe+';">↻</span>':'')+(isBday?sprinkleSvg():'')+'</div>';
+    }
+    h+='</div>';
   }
-  h += '</div></div>';
+  h+='</div>';
   return h;
 }
 
+/* ===== Team-Übersicht: Spalten = Kalenderwochen (nicht Tage) ===== */
+function weeksOfYear(year){
+  // Liste aller KW mit repräsentativem Datum (Montag) im Jahr
+  var weeks=[]; var seen={};
+  var d=new Date(year,0,1);
+  var end=new Date(year,11,31);
+  while(d<=end){
+    var kw=isoWeek(d.getFullYear(),d.getMonth(),d.getDate());
+    // KW dem Jahr zuordnen, in dem der Donnerstag liegt
+    var tmp=new Date(d); var day=(tmp.getDay()+6)%7; tmp.setDate(tmp.getDate()-day+3);
+    if(tmp.getFullYear()===year && !seen[kw]){
+      seen[kw]=true;
+      // Monat für Gruppierung: Monat des Donnerstags
+      weeks.push({ kw:kw, month:tmp.getMonth() });
+    }
+    d.setDate(d.getDate()+7);
+  }
+  // sicherstellen, dass KW1..letzte sortiert
+  weeks.sort(function(a,b){ return a.kw-b.kw; });
+  return weeks;
+}
+function empHasUrlaubInWeek(emp,year,kw){
+  var u=emp.urlaub;
+  for(var i=0;i<u.length;i++){
+    if(u[i].slice(0,4)!==String(year)) continue;
+    if(isoWeekFromISO(u[i])===kw) return true;
+  }
+  return false;
+}
 function tableHtml(){
-  var year = STATE.year;
-  var ferSet = FERSETS[year] || (FERSETS[year] = ferienDaysSet(year));
-  var today = TODAY;
-  var emps = STATE.data.employees;
-  var m, d;
+  var year=STATE.year;
+  var emps=STATE.data.employees;
+  var weeks=weeksOfYear(year);
+  var i,w;
 
-  // Überschneidungen pro Tag zählen
-  var proTag = {};
-  for (var e=0;e<emps.length;e++){
-    var u = emps[e].urlaub;
-    for (var q=0;q<u.length;q++){ if (u[q].slice(0,4)===String(year)) proTag[u[q]] = (proTag[u[q]]||0)+1; }
-  }
-
-  var h = '<table class="cal"><thead><tr>';
-  h += '<th class="nameh" rowspan="2">Mitarbeiter</th>';
-  h += '<th class="uhead" rowspan="2">Urlaub<br>/ '+URLAUBS_LIMIT+'</th>';
-  for (m=0;m<12;m++) h += '<th class="mhead" colspan="'+daysInMonth(year,m)+'">'+MONTHS[m]+'</th>';
-  h += '</tr><tr>';
-  for (m=0;m<12;m++){
-    var dm = daysInMonth(year,m);
-    for (d=0;d<dm;d++){
-      var dow = new Date(year,m,d+1).getDay();
-      h += '<th style="'+(d===0?'border-left:3px solid #000;':'')+'">'+(d+1)+'<br>'+WD[dow]+'</th>';
+  // Überschneidungen pro KW zählen (wie viele MA in dieser KW Urlaub haben)
+  var proKW={};
+  for(i=0;i<emps.length;i++){
+    for(w=0;w<weeks.length;w++){
+      if(empHasUrlaubInWeek(emps[i],year,weeks[w].kw)) proKW[weeks[w].kw]=(proKW[weeks[w].kw]||0)+1;
     }
   }
-  h += '</tr></thead><tbody>';
 
-  for (var i=0;i<emps.length;i++){
-    var emp = emps[i];
-    var prior = priorYearMMDD(emp, year);
-    var fr = FACH_ROW[emp.fach];
-    var nameBg = "#fff";
-    var nameStyle = "background:"+nameBg+";color:"+(emp.me?COL.accent:"#000")+";";
-    if (fr) nameStyle += "border-left:4px solid "+fr.line+";";
-    var used = zaehleUrlaub(emp, year);
-    var over = used > URLAUBS_LIMIT;
-    var tight = !over && (URLAUBS_LIMIT - used) <= 3;
+  var h='<table class="cal"><thead><tr>';
+  h+='<th class="nameh">Mitarbeiter</th>';
+  h+='<th class="uhead">Urlaub<br>/ '+URLAUBS_LIMIT+'</th>';
+  for(w=0;w<weeks.length;w++){
+    var kwColor=(weeks[w].kw%2===0)?COL.kwA:COL.kwB;
+    h+='<th style="background:'+kwColor+';min-width:40px;">'+weeks[w].kw+'</th>';
+  }
+  h+='</tr></thead><tbody>';
 
-    h += '<tr>';
-    h += '<td class="name" style="'+nameStyle+'">'+esc(emp.name)+(emp.fach?'<small>'+emp.fach+'</small>':'')+'</td>';
-    var uStyle = over ? "background:"+COL.over+";color:#fff;" : (tight ? "background:"+COL.overBg+";color:"+COL.over+";" : "");
-    h += '<td class="ucell" style="'+uStyle+'">'+used+(over?' ⚠':'')+'</td>';
-
-    for (m=0;m<12;m++){
-      var dm2 = daysInMonth(year,m);
-      for (d=0;d<dm2;d++){
-        var ds = iso(year,m,d);
-        var dow2 = new Date(year,m,d+1).getDay();
-        var isWe = (dow2===0 || dow2===6);
-        var isFer = !!ferSet[ds];
-        var ftName = feiertagName(ds);
-        var isUrl = emp.urlaub.indexOf(ds) >= 0;
-        var isRepeat = isUrl && !!prior[ds.slice(5)];
-        var isOverlap = isUrl && (proTag[ds]||0) >= 2;
-        var isTod = (ds===today);
-
-        var bg = "#fff";
-        if (isWe) bg = COL.weekend;
-        if (isFer) bg = COL.ferien;
-        if (ftName) bg = "#000";
-        if (isUrl) bg = COL.accent;
-        if (isRepeat && !isOverlap) bg = COL.vorjahr;
-
-        var st = "background:"+bg+";";
-        st += "border-left:"+(d===0?"3px solid #000":"1px solid #000")+";";
-        if (isOverlap && isRepeat) st += "box-shadow:inset 0 0 0 3px #000;";
-        else if (isRepeat) st += "box-shadow:inset 0 0 0 2px #000;";
-        if (isOverlap) st += "background-image:repeating-linear-gradient(45deg,"+COL.accent+","+COL.accent+" 4px,#000 4px,#000 7px);";
-        else if (isFer && isUrl && !isRepeat) st += "background-image:repeating-linear-gradient(45deg,"+COL.accent+","+COL.accent+" 5px,"+COL.ferien+" 5px,"+COL.ferien+" 10px);";
-        if (isTod) st += "outline:3px solid "+COL.accent+";outline-offset:-3px;";
-
-        var tip = esc(emp.name)+" · "+(d+1)+". "+MONTHS_FULL[m]+" "+year;
-        if (ftName) tip += " — "+ftName;
-        if (isFer) tip += " (Ferien)";
-        if (isOverlap) tip += " — Überschneidung ("+proTag[ds]+" im Urlaub)";
-        if (isRepeat) tip += " — wie im Vorjahr";
-        h += '<td class="daycell" style="'+st+'" title="'+tip+'" data-day="'+ds+'" data-person="'+emp.id+'"></td>';
+  for(i=0;i<emps.length;i++){
+    var emp=emps[i];
+    var prior=priorYearMMDD(emp,year);
+    var frline=FACH_ROW[emp.fach];
+    var nameStyle="color:"+(emp.me?COL.berry:COL.ink)+";";
+    if(frline) nameStyle+="border-left:5px solid "+frline+";";
+    var used=zaehleUrlaub(emp,year), over=used>URLAUBS_LIMIT, tight=!over&&(URLAUBS_LIMIT-used)<=3;
+    h+='<tr>';
+    h+='<td class="name" style="'+nameStyle+'">'+esc(emp.name)+(emp.fach?'<small>'+emp.fach+'</small>':'')+'</td>';
+    var uStyle= over?"background:"+COL.over+";color:#fff;":(tight?"background:"+COL.overBg+";color:"+COL.over+";":"");
+    h+='<td class="ucell" style="'+uStyle+'">'+used+(over?' ⚠':'')+'</td>';
+    for(w=0;w<weeks.length;w++){
+      var kw=weeks[w].kw;
+      var kwBg=(kw%2===0)?COL.kwA:COL.kwB;
+      var hasU=empHasUrlaubInWeek(emp,year,kw);
+      // Wiederholung: hatte MA in gleicher KW im Vorjahr Urlaub? (per MM-DD Näherung: irgendein Urlaubstag dieser KW war Vorjahr)
+      var isRepeat=false;
+      if(hasU){
+        for(var uu=0;uu<emp.urlaub.length;uu++){
+          var dsx=emp.urlaub[uu];
+          if(dsx.slice(0,4)===String(year) && isoWeekFromISO(dsx)===kw && prior[dsx.slice(5)]){ isRepeat=true; break; }
+        }
       }
+      var isOverlap=hasU && (proKW[kw]||0)>=2;
+      var st="min-width:40px;background:"+kwBg+";";
+      if(hasU){ st="min-width:40px;background:"+COL.berry+";"; }
+      if(isRepeat && !isOverlap){ st="min-width:40px;background:"+COL.vorjahr+";box-shadow:inset 0 0 0 2px "+COL.vorjahrLine+";"; }
+      if(isOverlap){ st="min-width:40px;background-image:repeating-linear-gradient(45deg,"+COL.berry+","+COL.berry+" 4px,#fff 4px,#fff 7px);"; }
+      var tip=esc(emp.name)+" · KW "+kw;
+      if(hasU) tip+=" — Urlaub";
+      if(isOverlap) tip+=" — Überschneidung ("+proKW[kw]+" im Urlaub)";
+      if(isRepeat) tip+=" — wie im Vorjahr";
+      h+='<td class="kwcolcell" style="'+st+'" title="'+tip+'"></td>';
     }
-    h += '</tr>';
+    h+='</tr>';
   }
-  h += '</tbody></table>';
+  h+='</tbody></table>';
   return h;
 }
-
 function renderTeam(){
-  var emps = STATE.data.employees;
-  var h = '<div class="card" style="padding:16px;">';
-  h += '<p class="sub">'+emps.length+' Personen im Team VK2. Namen anpassen, Geburtstag hinterlegen oder Personen verwalten.</p>';
-  h += '<div>';
-  for (var i=0;i<emps.length;i++){
-    var e = emps[i];
-    h += '<div class="emprow">';
-    h += '<span class="nm">'+esc(e.name)+'</span>';
-    if (e.me) h += '<span class="badge me">ICH</span>';
-    if (e.fach) h += '<span class="badge fach" style="background:'+(FACH_FARBE[e.fach]||"#6b6b6b")+';">'+e.fach+'</span>';
-    if (e.azubi) h += '<span class="badge outline">Azubi</span>';
-    if (e.teilzeit) h += '<span class="badge outline">Teilzeit</span>';
-    if (e.vollzeit) h += '<span class="badge grey">Vollzeit</span>';
-    if (e.pflege) h += '<span class="badge black">🫂 Pflege</span>';
-    if (e.schulkinder) h += '<span class="badge black">🎒 Schulkinder</span>';
-    h += '<span class="spacer"></span>';
-    h += '<span style="color:#6b6b6b;font-size:13px;">'+(e.birthday?('🎂 '+fmtBday(e.birthday)):'kein Geburtstag')+'</span>';
-    h += '<button class="btn ghost sm" data-edit="'+e.id+'">Bearbeiten</button>';
-    if (!e.me) h += '<button class="btn red-ghost" data-del="'+e.id+'">Entfernen</button>';
-    h += '</div>';
+  var emps=STATE.data.employees;
+  var h='<div class="card" style="padding:18px;">';
+  h+='<p class="sub">'+emps.length+' Personen im Team VK2. Namen anpassen, Merkmale pflegen, Personen hinzufügen oder entfernen.</p>';
+  h+='<div>';
+  for(var i=0;i<emps.length;i++){
+    var e=emps[i];
+    h+='<div class="emprow">';
+    h+='<span class="nm">'+esc(e.name)+'</span>';
+    if(e.me) h+='<span class="badge me">ICH</span>';
+    if(e.fach) h+='<span class="badge fach" style="background:'+(FACH_FARBE[e.fach]||COL.taupe)+';">'+e.fach+'</span>';
+    if(e.azubi) h+='<span class="badge soft">Azubi</span>';
+    if(e.teilzeit) h+='<span class="badge soft">Teilzeit</span>';
+    if(e.vollzeit) h+='<span class="badge soft">Vollzeit</span>';
+    if(e.betriebsrat>0) h+='<span class="badge sage">Betriebsrat'+(e.betriebsrat>1?' ×'+e.betriebsrat:'')+'</span>';
+    if(e.kinder>0) h+='<span class="badge berry">🧒 '+e.kinder+'</span>';
+    if(e.pflege>0) h+='<span class="badge berry">🫂 '+e.pflege+'</span>';
+    h+='<span class="spacer"></span>';
+    h+='<span style="color:var(--muted);font-size:13px;">'+(e.birthday?('🎂 '+fmtBday(e.birthday)):'kein Geburtstag')+'</span>';
+    h+='<button class="btn ghost sm" data-edit="'+e.id+'">Bearbeiten</button>';
+    if(!e.me) h+='<button class="btn red-ghost" data-del="'+e.id+'">Entfernen</button>';
+    h+='</div>';
   }
-  h += '</div>';
-  h += '<div style="margin-top:16px;"><button class="btn" id="addPerson">+ Person hinzufügen</button></div>';
+  h+='</div>';
+  h+='<div style="margin-top:16px;"><button class="btn" id="addPerson">+ Person hinzufügen</button></div>';
 
-  h += '<div class="exportbox"><h3>Daten sichern &amp; übertragen</h3>';
-  h += '<p class="sub" style="margin-bottom:12px;">Deine Daten liegen nur auf diesem Gerät. Zum Übertragen auf ein anderes Gerät (z.&nbsp;B. Handy&nbsp;→&nbsp;PC): hier <b>exportieren</b>, die Datei aufs andere Gerät bringen und dort <b>importieren</b>.</p>';
-  h += '<div class="exportrow">';
-  h += '<button class="btn black" id="btnExport">⬇ Exportieren (Datei)</button>';
-  h += '<button class="btn ghost" id="btnImport">⬆ Importieren (Datei)</button>';
-  h += '<input type="file" id="fileImport" accept="application/json,.json" style="display:none;">';
-  h += '</div></div>';
+  // Cloud-Sync
+  var st = SYNC_STATUS, on = syncEnabled();
+  var stLabel = !on ? "nicht verbunden" : (st==="ok"?"verbunden ✓":(st==="saving"?"speichert…":(st==="loading"?"lädt…":(st==="error"?"Fehler":"bereit"))));
+  h+='<div class="syncbox"><h3>Cloud-Synchronisierung</h3>';
+  h+='<p class="sub" style="margin-bottom:10px;">Für Zugriff von Handy <b>und</b> Laptop. Einmalig bei <b>jsonbin.io</b> kostenlos anmelden, dort einen „Bin" anlegen und hier <b>API-Key</b> und <b>Bin-ID</b> eintragen. Danach synchronisiert sich alles automatisch. <span class="syncstate '+(on?'on':'off')+'">'+stLabel+'</span></p>';
+  h+='<div class="syncfields">';
+  h+='<div><label class="lbl">JSONBin API-Key (X-Master-Key)</label><input type="text" id="syncKey" value="'+esc(SYNC.apiKey)+'" placeholder="$2a$10$..." style="width:100%;"></div>';
+  h+='<div><label class="lbl">Bin-ID</label><input type="text" id="syncBin" value="'+esc(SYNC.binId)+'" placeholder="z. B. 65f1a2..." style="width:100%;"></div>';
+  h+='</div>';
+  h+='<div class="exportrow">';
+  h+='<button class="btn" id="syncSave">Verbinden & speichern</button>';
+  h+='<button class="btn taupe" id="syncPull">Von Cloud laden</button>';
+  h+='<button class="btn ghost" id="syncOff">Trennen</button>';
+  h+='</div></div>';
 
-  h += '</div>';
+  // Export/Import
+  h+='<div class="exportbox"><h3>Sicherung (Datei)</h3>';
+  h+='<p class="sub" style="margin-bottom:10px;">Unabhängig von der Cloud kannst du die Daten als Datei sichern oder einlesen.</p>';
+  h+='<div class="exportrow">';
+  h+='<button class="btn taupe" id="btnExport">⬇ Exportieren</button>';
+  h+='<button class="btn ghost" id="btnImport">⬆ Importieren</button>';
+  h+='<input type="file" id="fileImport" accept="application/json,.json" style="display:none;">';
+  h+='</div></div>';
+
+  h+='</div>';
   return h;
 }
 
 function renderBday(){
-  var emps = STATE.data.employees;
-  var withB = [];
-  for (var i=0;i<emps.length;i++) if (emps[i].birthday) withB.push(emps[i]);
-  var now = new Date();
-  var base = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  function du(b){
-    var p = b.split("-");
-    var mm = p.length===3 ? +p[1] : +p[0];
-    var dd = p.length===3 ? +p[2] : +p[1];
-    var next = new Date(now.getFullYear(), mm-1, dd);
-    if (next < base) next = new Date(now.getFullYear()+1, mm-1, dd);
-    return Math.round((next-base)/86400000);
-  }
+  var emps=STATE.data.employees;
+  var withB=[];
+  for(var i=0;i<emps.length;i++) if(emps[i].birthday) withB.push(emps[i]);
+  var now=new Date(), base=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  function du(b){ var p=b.split("-"); var mm=p.length===3?+p[1]:+p[0]; var dd=p.length===3?+p[2]:+p[1]; var next=new Date(now.getFullYear(),mm-1,dd); if(next<base) next=new Date(now.getFullYear()+1,mm-1,dd); return Math.round((next-base)/86400000); }
   withB.sort(function(a,b){ return du(a.birthday)-du(b.birthday); });
-
-  if (withB.length===0){
-    return '<div class="card" style="padding:16px;"><div class="empty">Noch keine Geburtstage hinterlegt.<br>Trage sie im Reiter „Mitarbeiter" pro Person ein.</div></div>';
+  if(withB.length===0) return '<div class="card" style="padding:18px;"><div class="empty">Noch keine Geburtstage hinterlegt.<br>Trage sie im Reiter „Mitarbeiter" pro Person ein.</div></div>';
+  var h='<div class="card"><div style="padding:18px 18px 0;"><p class="sub">Sortiert nach dem nächsten anstehenden Geburtstag.</p></div><div class="bdaygrid">';
+  for(var k=0;k<withB.length;k++){
+    var e=withB[k], d=du(e.birthday), soon=d<=14;
+    h+='<div class="bcard'+(soon?' soon':'')+'"><span class="cake">🎂</span><div><div class="bn">'+esc(e.name)+'</div><div class="bd">'+fmtBday(e.birthday)+' · '+(d===0?'heute! 🎉':'in '+d+' Tagen')+'</div></div></div>';
   }
-  var h = '<div class="card"><div style="padding:16px 16px 0;"><p class="sub">Sortiert nach dem nächsten anstehenden Geburtstag.</p></div><div class="bdaygrid">';
-  for (var k=0;k<withB.length;k++){
-    var e = withB[k];
-    var d = du(e.birthday);
-    var soon = d <= 14;
-    h += '<div class="bcard'+(soon?' soon':'')+'"><span class="cake">🎂</span><div><div class="bn">'+esc(e.name)+'</div><div class="bd">'+fmtBday(e.birthday)+' · '+(d===0?'heute! 🎉':'in '+d+' Tagen')+'</div></div></div>';
-  }
-  h += '</div></div>';
+  h+='</div></div>';
   return h;
 }
 
-/* ====================== MODAL (Bearbeiten) ====================== */
-function openEdit(id){
-  var emps = STATE.data.employees, emp = null;
-  for (var i=0;i<emps.length;i++) if (emps[i].id===id){ emp = emps[i]; break; }
-  if (!emp) return;
-
-  var bParts = emp.birthday ? emp.birthday.split("-") : null;
-  var initDate = bParts ? (bParts.length===3 ? emp.birthday : "2000-"+bParts[0]+"-"+bParts[1]) : "";
-
-  var overlay = document.createElement("div");
-  overlay.className = "modal-bg";
-  var h = '<div class="modal"><h3>Bearbeiten</h3><div class="fields">';
-  h += '<div><label class="lbl">Name</label><input type="text" id="mName" value="'+esc(emp.name)+'"></div>';
-  h += '<div><label class="lbl">Fachbereich</label><select id="mFach"><option value="">— kein Fachbereich —</option>';
-  for (var f=0;f<FACHBEREICHE.length;f++){ h += '<option value="'+FACHBEREICHE[f]+'"'+(emp.fach===FACHBEREICHE[f]?' selected':'')+'>'+FACHBEREICHE[f]+'</option>'; }
-  h += '</select></div>';
-  h += chkHtml("mAzubi", emp.azubi, "Auszubildende:r");
-  h += chkHtml("mVollzeit", emp.vollzeit, "Vollzeit");
-  h += chkHtml("mTeilzeit", emp.teilzeit, "Teilzeit");
-  h += chkHtml("mPflege", emp.pflege, "Pflegebedürftige Angehörige");
-  h += chkHtml("mSchul", emp.schulkinder, "Hat schulpflichtige Kinder");
-  h += '<div><label class="lbl">Geburtstag (Jahr egal)</label><input type="date" id="mBday" value="'+initDate+'"></div>';
-  h += '</div><div class="actions"><button class="btn ghost" id="mCancel">Abbrechen</button><button class="btn" id="mSave">Speichern</button></div></div>';
-  overlay.innerHTML = h;
-  document.body.appendChild(overlay);
-
-  function upd(){
-    overlay.querySelector('[data-for=mAzubi]').classList.toggle("on", document.getElementById("mAzubi").checked);
-    overlay.querySelector('[data-for=mVollzeit]').classList.toggle("on", document.getElementById("mVollzeit").checked);
-    overlay.querySelector('[data-for=mTeilzeit]').classList.toggle("on", document.getElementById("mTeilzeit").checked);
-    overlay.querySelector('[data-for=mPflege]').classList.toggle("on", document.getElementById("mPflege").checked);
-    overlay.querySelector('[data-for=mSchul]').classList.toggle("on", document.getElementById("mSchul").checked);
-  }
-  // Vollzeit / Teilzeit gegenseitig ausschließen
-  document.getElementById("mVollzeit").addEventListener("change", function(){ if(this.checked) document.getElementById("mTeilzeit").checked=false; upd(); });
-  document.getElementById("mTeilzeit").addEventListener("change", function(){ if(this.checked) document.getElementById("mVollzeit").checked=false; upd(); });
-  document.getElementById("mAzubi").addEventListener("change", upd);
-  document.getElementById("mPflege").addEventListener("change", upd);
-  document.getElementById("mSchul").addEventListener("change", upd);
-
-  overlay.addEventListener("mousedown", function(ev){ if (ev.target === overlay) document.body.removeChild(overlay); });
-  document.getElementById("mCancel").addEventListener("click", function(){ document.body.removeChild(overlay); });
-  document.getElementById("mSave").addEventListener("click", function(){
-    var name = document.getElementById("mName").value.trim() || emp.name;
-    var bday = document.getElementById("mBday").value;
-    var b = "";
-    if (bday){ var p = bday.split("-"); b = p[1]+"-"+p[2]; }
-    emp.name = name;
-    emp.fach = document.getElementById("mFach").value;
-    emp.azubi = document.getElementById("mAzubi").checked;
-    emp.vollzeit = document.getElementById("mVollzeit").checked;
-    emp.teilzeit = document.getElementById("mTeilzeit").checked;
-    emp.pflege = document.getElementById("mPflege").checked;
-    emp.schulkinder = document.getElementById("mSchul").checked;
-    emp.birthday = b;
-    saveData();
-    document.body.removeChild(overlay);
-    render();
-  });
+/* ====================== MODAL ====================== */
+function counterHtml(id,label,val){
+  return '<div class="counter"><span class="clabel">'+label+'</span><span class="cctrl"><button type="button" class="cbtn" data-dec="'+id+'">–</button><input type="number" min="0" id="'+id+'" class="cnum" value="'+val+'"><button type="button" class="cbtn" data-inc="'+id+'">+</button></span></div>';
 }
-function chkHtml(id, on, label){
+function chkHtml(id,on,label){
   return '<label class="chk'+(on?' on':'')+'" data-for="'+id+'"><input type="checkbox" id="'+id+'"'+(on?' checked':'')+'> <span>'+label+'</span></label>';
 }
+function openEdit(id){
+  var emps=STATE.data.employees,emp=null;
+  for(var i=0;i<emps.length;i++) if(emps[i].id===id){ emp=emps[i]; break; }
+  if(!emp) return;
+  var bParts=emp.birthday?emp.birthday.split("-"):null;
+  var initDate=bParts?(bParts.length===3?emp.birthday:"2000-"+bParts[0]+"-"+bParts[1]):"";
+  var overlay=document.createElement("div"); overlay.className="modal-bg";
+  var h='<div class="modal"><h3>Bearbeiten</h3><div class="fields">';
+  h+='<div><label class="lbl">Name</label><input type="text" id="mName" value="'+esc(emp.name)+'"></div>';
+  h+='<div><label class="lbl">Fachbereich</label><select id="mFach"><option value="">— kein Fachbereich —</option>';
+  for(var f=0;f<FACHBEREICHE.length;f++) h+='<option value="'+FACHBEREICHE[f]+'"'+(emp.fach===FACHBEREICHE[f]?' selected':'')+'>'+FACHBEREICHE[f]+'</option>';
+  h+='</select></div>';
+  h+=chkHtml("mAzubi",emp.azubi,"Auszubildende:r");
+  h+=chkHtml("mVollzeit",emp.vollzeit,"Vollzeit");
+  h+=chkHtml("mTeilzeit",emp.teilzeit,"Teilzeit");
+  h+=counterHtml("mKinder","Anzahl Kinder",emp.kinder||0);
+  h+=counterHtml("mPflege","Pflegebedürftige Angehörige",emp.pflege||0);
+  h+=counterHtml("mBR","Betriebsrat (Anzahl Ämter)",emp.betriebsrat||0);
+  h+='<div><label class="lbl">Geburtstag (Jahr egal)</label><input type="date" id="mBday" value="'+initDate+'"></div>';
+  h+='</div><div class="actions"><button class="btn ghost" id="mCancel">Abbrechen</button><button class="btn" id="mSave">Speichern</button></div></div>';
+  overlay.innerHTML=h;
+  document.getElementById("modalRoot").appendChild(overlay);
 
+  function upd(){
+    ["mAzubi","mVollzeit","mTeilzeit"].forEach(function(cid){
+      var el=overlay.querySelector('[data-for='+cid+']'); if(el) el.classList.toggle("on", document.getElementById(cid).checked);
+    });
+  }
+  document.getElementById("mVollzeit").addEventListener("change",function(){ if(this.checked) document.getElementById("mTeilzeit").checked=false; upd(); });
+  document.getElementById("mTeilzeit").addEventListener("change",function(){ if(this.checked) document.getElementById("mVollzeit").checked=false; upd(); });
+  document.getElementById("mAzubi").addEventListener("change",upd);
+
+  overlay.querySelectorAll("[data-inc]").forEach(function(b){ b.addEventListener("click",function(){ var el=document.getElementById(b.getAttribute("data-inc")); el.value=(parseInt(el.value,10)||0)+1; }); });
+  overlay.querySelectorAll("[data-dec]").forEach(function(b){ b.addEventListener("click",function(){ var el=document.getElementById(b.getAttribute("data-dec")); el.value=Math.max(0,(parseInt(el.value,10)||0)-1); }); });
+
+  overlay.addEventListener("mousedown",function(ev){ if(ev.target===overlay) close(); });
+  function close(){ document.getElementById("modalRoot").removeChild(overlay); }
+  document.getElementById("mCancel").addEventListener("click",close);
+  document.getElementById("mSave").addEventListener("click",function(){
+    emp.name=document.getElementById("mName").value.trim()||emp.name;
+    emp.fach=document.getElementById("mFach").value;
+    emp.azubi=document.getElementById("mAzubi").checked;
+    emp.vollzeit=document.getElementById("mVollzeit").checked;
+    emp.teilzeit=document.getElementById("mTeilzeit").checked;
+    emp.kinder=Math.max(0,parseInt(document.getElementById("mKinder").value,10)||0);
+    emp.pflege=Math.max(0,parseInt(document.getElementById("mPflege").value,10)||0);
+    emp.betriebsrat=Math.max(0,parseInt(document.getElementById("mBR").value,10)||0);
+    var bday=document.getElementById("mBday").value, b="";
+    if(bday){ var p=bday.split("-"); b=p[1]+"-"+p[2]; }
+    emp.birthday=b;
+    saveData(); close(); render();
+  });
+}
 /* ====================== EVENTS ====================== */
 function bindEvents(){
-  var app = document.getElementById("app");
-
-  var tabs = app.querySelectorAll("[data-tab]");
-  tabs.forEach(function(b){ b.addEventListener("click", function(){ STATE.tab = b.getAttribute("data-tab"); render(); }); });
-
-  var yn = app.querySelectorAll("[data-year]");
-  yn.forEach(function(b){ b.addEventListener("click", function(){ STATE.year += parseInt(b.getAttribute("data-year"),10); render(); }); });
-
-  var vt = app.querySelectorAll("[data-view]");
-  vt.forEach(function(b){ b.addEventListener("click", function(){ STATE.view = b.getAttribute("data-view"); render(); }); });
-
-  var sp = document.getElementById("selPerson");
-  if (sp) sp.addEventListener("change", function(){ STATE.selPerson = sp.value; render(); });
-
-  var days = app.querySelectorAll("[data-day]");
-  days.forEach(function(c){
-    c.addEventListener("click", function(){ toggleDay(c.getAttribute("data-person"), c.getAttribute("data-day")); });
-  });
-
-  var edits = app.querySelectorAll("[data-edit]");
-  edits.forEach(function(b){ b.addEventListener("click", function(){ openEdit(b.getAttribute("data-edit")); }); });
-
-  var dels = app.querySelectorAll("[data-del]");
-  dels.forEach(function(b){ b.addEventListener("click", function(){
-    var id = b.getAttribute("data-del");
-    var emps = STATE.data.employees, nm = "";
-    for (var i=0;i<emps.length;i++) if (emps[i].id===id) nm = emps[i].name;
-    if (confirm(nm+" wirklich entfernen?")){
-      STATE.data.employees = emps.filter(function(e){ return e.id !== id; });
-      saveData(); render();
-    }
+  var app=document.getElementById("app");
+  app.querySelectorAll("[data-tab]").forEach(function(b){ b.addEventListener("click",function(){ STATE.tab=b.getAttribute("data-tab"); render(); }); });
+  app.querySelectorAll("[data-year]").forEach(function(b){ b.addEventListener("click",function(){ STATE.year+=parseInt(b.getAttribute("data-year"),10); render(); }); });
+  app.querySelectorAll("[data-view]").forEach(function(b){ b.addEventListener("click",function(){ STATE.view=b.getAttribute("data-view"); render(); }); });
+  var sp=document.getElementById("selPerson"); if(sp) sp.addEventListener("change",function(){ STATE.selPerson=sp.value; render(); });
+  app.querySelectorAll("[data-day]").forEach(function(c){ c.addEventListener("click",function(){ toggleDay(c.getAttribute("data-person"),c.getAttribute("data-day")); }); });
+  app.querySelectorAll("[data-edit]").forEach(function(b){ b.addEventListener("click",function(){ openEdit(b.getAttribute("data-edit")); }); });
+  app.querySelectorAll("[data-del]").forEach(function(b){ b.addEventListener("click",function(){
+    var id=b.getAttribute("data-del"),emps=STATE.data.employees,nm="";
+    for(var i=0;i<emps.length;i++) if(emps[i].id===id) nm=emps[i].name;
+    if(confirm(nm+" wirklich entfernen?")){ STATE.data.employees=emps.filter(function(e){ return e.id!==id; }); saveData(); render(); }
   }); });
+  var add=document.getElementById("addPerson");
+  if(add) add.addEventListener("click",function(){ var id="e"+Date.now(); STATE.data.employees.push(mk(id,"Neuer Mitarbeiter",{})); saveData(); render(); });
 
-  var add = document.getElementById("addPerson");
-  if (add) add.addEventListener("click", function(){
-    var id = "e"+Date.now();
-    STATE.data.employees.push(mk(id, "Neuer Mitarbeiter", {}));
-    saveData(); render();
-  });
-
-  var ex = document.getElementById("btnExport");
-  if (ex) ex.addEventListener("click", exportToFile);
-
-  var im = document.getElementById("btnImport");
-  var fi = document.getElementById("fileImport");
-  if (im && fi){
-    im.addEventListener("click", function(){ fi.click(); });
-    fi.addEventListener("change", function(){
-      var f = fi.files && fi.files[0];
-      if (!f) return;
-      var reader = new FileReader();
-      reader.onload = function(){
-        try {
-          var imported = JSON.parse(reader.result);
-          if (!imported || !imported.employees || !imported.employees.length) throw new Error("Format");
-          if (confirm("Import überschreibt die aktuellen Daten auf diesem Gerät. Fortfahren?")){
-            STATE.data = imported; saveData();
-            alert("Daten erfolgreich importiert.");
-            render();
-          }
-        } catch(err){ alert("Import fehlgeschlagen: keine gültige VK2-Datei."); }
-        fi.value = "";
+  var ex=document.getElementById("btnExport"); if(ex) ex.addEventListener("click",exportToFile);
+  var im=document.getElementById("btnImport"), fi=document.getElementById("fileImport");
+  if(im&&fi){
+    im.addEventListener("click",function(){ fi.click(); });
+    fi.addEventListener("change",function(){
+      var f=fi.files&&fi.files[0]; if(!f) return;
+      var reader=new FileReader();
+      reader.onload=function(){
+        try{ var imported=JSON.parse(reader.result);
+          if(!imported||!imported.employees||!imported.employees.length) throw new Error("Format");
+          if(confirm("Import überschreibt die aktuellen Daten. Fortfahren?")){ applyData(imported); saveData(); alert("Daten importiert."); render(); }
+        }catch(err){ alert("Import fehlgeschlagen: keine gültige VK2-Datei."); }
+        fi.value="";
       };
       reader.readAsText(f);
     });
   }
+
+  // Sync-Buttons
+  var sk=document.getElementById("syncSave");
+  if(sk) sk.addEventListener("click",function(){
+    SYNC.apiKey=document.getElementById("syncKey").value.trim();
+    SYNC.binId=document.getElementById("syncBin").value.trim();
+    saveSyncCfg(SYNC);
+    if(syncEnabled()){ SYNC_STATUS="saving"; render(); cloudPushNow(); }
+    else { SYNC_STATUS="off"; render(); }
+  });
+  var spull=document.getElementById("syncPull");
+  if(spull) spull.addEventListener("click",function(){
+    SYNC.apiKey=document.getElementById("syncKey").value.trim();
+    SYNC.binId=document.getElementById("syncBin").value.trim();
+    saveSyncCfg(SYNC);
+    if(!syncEnabled()){ alert("Bitte zuerst API-Key und Bin-ID eintragen."); return; }
+    cloudLoad(function(rec){
+      if(rec){ applyData(rec); saveLocal(); alert("Daten aus der Cloud geladen."); render(); }
+      else { alert("Konnte nicht laden (Key/Bin prüfen oder Bin noch leer)."); render(); }
+    });
+  });
+  var soff=document.getElementById("syncOff");
+  if(soff) soff.addEventListener("click",function(){ SYNC={apiKey:"",binId:""}; saveSyncCfg(SYNC); SYNC_STATUS="off"; render(); });
 }
 
 /* ====================== START ====================== */
-var FERSETS = {};
-var TODAY = todayISO();
 initData();
 render();
+// Beim Start automatisch aus Cloud nachladen, wenn konfiguriert
+if(syncEnabled()){
+  cloudLoad(function(rec){ if(rec){ applyData(rec); saveLocal(); render(); } });
+}
 </script>
 </body>
 </html>
