@@ -51,14 +51,14 @@
   .personbar label { font-size: 13px; color: var(--muted); font-weight: 600; }
   .personbar select { flex: 1; min-width: 200px; }
   .cnt { font-size: 13px; font-weight: 700; padding: 7px 14px; border-radius: 999px; }
-  .monthgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 22px; padding: 20px; }
-  .month { border: 1.5px solid var(--line); border-radius: var(--radius); padding: 16px; background: var(--white); box-shadow: var(--shadow); min-width: 0; }
+  .monthgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(356px, 1fr)); gap: 20px; padding: 20px; justify-items: center; }
+  .month { border: 1.5px solid var(--line); border-radius: var(--radius); padding: 16px; background: var(--white); box-shadow: var(--shadow); width: 356px; max-width: 100%; overflow: hidden; }
   .month h4 { font-family: 'Caveat', cursive; font-size: 26px; margin: 0 0 12px; text-align: center; color: var(--berry); font-weight: 700; }
-  .monthgriddays { display: grid; grid-template-columns: repeat(8, 1fr); gap: 5px; }
-  .dowhead { text-align: center; font-size: 11px; color: var(--muted); font-weight: 700; display: flex; align-items: center; justify-content: center; padding-bottom: 2px; min-width: 0; }
+  .monthgriddays { display: grid; grid-template-columns: repeat(8, 36px); gap: 4px; justify-content: center; }
+  .dowhead { text-align: center; font-size: 11px; color: var(--muted); font-weight: 700; display: flex; align-items: center; justify-content: center; height: 20px; width: 36px; }
   .dowhead.kwhead { font-size: 10px; color: var(--taupe); }
-  .cellbox { height: 38px; display: flex; align-items: center; justify-content: center; font-size: 14px; position: relative; border-radius: var(--radius-sm); font-weight: 600; min-width: 0; border: 1.5px solid transparent; }
-  .kwcell { color: var(--taupe-d); font-size: 12px; font-weight: 700; border: 1.5px solid var(--line); }
+  .cellbox { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 13px; position: relative; border-radius: 9px; font-weight: 600; border: 1.5px solid transparent; }
+  .kwcell { color: var(--taupe-d); font-size: 11px; font-weight: 700; border: 1.5px solid var(--line); }
   .kwcell.empty { border: 1.5px solid transparent; background: transparent !important; }
   .day { cursor: pointer; user-select: none; border: 1.5px solid var(--line); background: var(--white); }
   .day.empty { border: 1.5px solid transparent; cursor: default; background: transparent; }
@@ -117,8 +117,12 @@
   .syncfields { display: flex; flex-direction: column; gap: 10px; margin: 12px 0; max-width: 460px; }
   @media (max-width: 640px) {
     h1 { font-size: 32px; }
-    .monthgrid { grid-template-columns: 1fr; padding: 14px; gap: 14px; }
-    .day { font-size: 15px; }
+    body { padding: 10px; }
+    .monthgrid { grid-template-columns: 1fr; padding: 12px; gap: 14px; }
+    .month { width: 100%; padding: 12px; }
+    .monthgriddays { grid-template-columns: repeat(8, 1fr); gap: 3px; }
+    .cellbox { width: auto; height: 34px; font-size: 12px; }
+    .dowhead { width: auto; }
   }
 </style>
 </head>
