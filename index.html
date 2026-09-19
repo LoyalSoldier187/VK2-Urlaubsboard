@@ -51,17 +51,17 @@
   .personbar label { font-size: 13px; color: var(--muted); font-weight: 600; }
   .personbar select { flex: 1; min-width: 200px; }
   .cnt { font-size: 13px; font-weight: 700; padding: 7px 14px; border-radius: 999px; }
-  .monthgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 22px; padding: 20px; }
-  .month { border: 1.5px solid var(--line); border-radius: var(--radius); padding: 16px; background: var(--white); box-shadow: var(--shadow); }
+  .monthgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 22px; padding: 20px; }
+  .month { border: 1.5px solid var(--line); border-radius: var(--radius); padding: 16px; background: var(--white); box-shadow: var(--shadow); min-width: 0; }
   .month h4 { font-family: 'Caveat', cursive; font-size: 26px; margin: 0 0 12px; text-align: center; color: var(--berry); font-weight: 700; }
   .monthgriddays { display: grid; grid-template-columns: repeat(8, 1fr); gap: 5px; }
-  .dowhead { text-align: center; font-size: 11px; color: var(--muted); font-weight: 700; display: flex; align-items: center; justify-content: center; padding-bottom: 2px; }
+  .dowhead { text-align: center; font-size: 11px; color: var(--muted); font-weight: 700; display: flex; align-items: center; justify-content: center; padding-bottom: 2px; min-width: 0; }
   .dowhead.kwhead { font-size: 10px; color: var(--taupe); }
-  .cellbox { aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; font-size: 14px; position: relative; border-radius: var(--radius-sm); font-weight: 600; }
+  .cellbox { height: 38px; display: flex; align-items: center; justify-content: center; font-size: 14px; position: relative; border-radius: var(--radius-sm); font-weight: 600; min-width: 0; border: 1.5px solid transparent; }
   .kwcell { color: var(--taupe-d); font-size: 12px; font-weight: 700; border: 1.5px solid var(--line); }
-  .kwcell.empty { border: none; background: transparent !important; }
+  .kwcell.empty { border: 1.5px solid transparent; background: transparent !important; }
   .day { cursor: pointer; user-select: none; border: 1.5px solid var(--line); background: var(--white); }
-  .day.empty { border: none; cursor: default; background: transparent; }
+  .day.empty { border: 1.5px solid transparent; cursor: default; background: transparent; }
   .day .rep { position: absolute; top: 2px; right: 3px; font-size: 9px; font-weight: 800; line-height: 1; }
   .sprinkle { position: absolute; inset: -3px; border-radius: 13px; pointer-events: none; z-index: 3; }
   .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: var(--radius); }
