@@ -51,19 +51,21 @@
   .personbar label { font-size: 13px; color: var(--muted); font-weight: 600; }
   .personbar select { flex: 1; min-width: 200px; }
   .cnt { font-size: 13px; font-weight: 700; padding: 7px 14px; border-radius: 999px; }
-  .monthgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(356px, 1fr)); gap: 20px; padding: 20px; justify-items: center; }
-  .month { border: 1.5px solid var(--line); border-radius: var(--radius); padding: 16px; background: var(--white); box-shadow: var(--shadow); width: 356px; max-width: 100%; overflow: hidden; }
-  .month h4 { font-family: 'Caveat', cursive; font-size: 26px; margin: 0 0 12px; text-align: center; color: var(--berry); font-weight: 700; }
-  .monthgriddays { display: grid; grid-template-columns: repeat(8, 36px); gap: 4px; justify-content: center; }
-  .dowhead { text-align: center; font-size: 11px; color: var(--muted); font-weight: 700; display: flex; align-items: center; justify-content: center; height: 20px; width: 36px; }
-  .dowhead.kwhead { font-size: 10px; color: var(--taupe); }
-  .cellbox { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 13px; position: relative; border-radius: 9px; font-weight: 600; border: 1.5px solid transparent; }
-  .kwcell { color: var(--taupe-d); font-size: 11px; font-weight: 700; border: 1.5px solid var(--line); }
-  .kwcell.empty { border: 1.5px solid transparent; background: transparent !important; }
-  .day { cursor: pointer; user-select: none; border: 1.5px solid var(--line); background: var(--white); }
-  .day.empty { border: 1.5px solid transparent; cursor: default; background: transparent; }
-  .day .rep { position: absolute; top: 2px; right: 3px; font-size: 9px; font-weight: 800; line-height: 1; }
-  .sprinkle { position: absolute; inset: -3px; border-radius: 13px; pointer-events: none; z-index: 3; }
+  /* ===== MONATSANSICHT (neu aufgebaut nach Referenz) ===== */
+  .monthgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 18px; }
+  .month { border: 1.5px solid var(--line); border-radius: var(--radius); padding: 14px; background: var(--white); box-shadow: var(--shadow); }
+  .month h4 { font-family: 'Caveat', cursive; font-size: 24px; margin: 0 0 10px; text-align: left; color: var(--berry); font-weight: 700; }
+  .mtable { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  .mtable th { font-size: 10px; color: var(--muted); font-weight: 700; padding: 3px 0; text-align: center; }
+  .mtable th.kwh { color: var(--taupe); font-size: 9px; }
+  .mtable td { text-align: center; padding: 2px; }
+  .mcell { width: 100%; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; border-radius: 6px; position: relative; box-sizing: border-box; }
+  .mcell.day { border: 1px solid var(--line); background: #fff; cursor: pointer; color: var(--ink); }
+  .mcell.kw { border: 1px solid var(--line); font-size: 10px; font-weight: 700; color: var(--taupe-d); }
+  .mcell .rep { position: absolute; top: 0; right: 2px; font-size: 8px; font-weight: 800; line-height: 1; }
+  .mcell .sprinkle { position: absolute; inset: 0; border-radius: 6px; pointer-events: none; z-index: 3; }
+  @media (max-width: 1100px){ .monthgrid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 820px){ .monthgrid { grid-template-columns: repeat(2, 1fr); } }
   .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: var(--radius); }
   table.cal { border-collapse: separate; border-spacing: 0; width: 100%; font-size: 12px; }
   table.cal th, table.cal td { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); text-align: center; padding: 0; }
@@ -119,10 +121,7 @@
     h1 { font-size: 32px; }
     body { padding: 10px; }
     .monthgrid { grid-template-columns: 1fr; padding: 12px; gap: 14px; }
-    .month { width: 100%; padding: 12px; }
-    .monthgriddays { grid-template-columns: repeat(8, 1fr); gap: 3px; }
-    .cellbox { width: auto; height: 34px; font-size: 12px; }
-    .dowhead { width: auto; }
+    .month { padding: 12px; }
   }
 </style>
 </head>
@@ -164,7 +163,7 @@ var FEIERTAGE = {
 };
 
 function mk(id,name,opts){
-  var e={id:id,name:name,me:false,birthday:"",urlaub:[],azubi:false,teilzeit:false,vollzeit:false,fach:"",kinder:0,pflege:0,betriebsrat:0,schicht:"",behinderung:false,zusatzurlaub:0};
+  var e={id:id,name:name,me:false,birthday:"",urlaub:[],azubi:false,teilzeit:false,vollzeit:false,fach:"",kinder:0,pflege:0,betriebsrat:0,schicht:"",behinderung:false,gdb:0,zusatzurlaub:0};
   for(var k in opts) e[k]=opts[k];
   return e;
 }
@@ -341,6 +340,7 @@ function normalizeEmp(e){
   if(!("fach" in e)) e.fach="";
   if(!("schicht" in e)) e.schicht="";
   if(!("behinderung" in e)) e.behinderung=false;
+  if(typeof e.gdb!=="number") e.gdb=0;
   if(typeof e.zusatzurlaub!=="number") e.zusatzurlaub=0;
   if(!e.urlaub) e.urlaub=[];
   return e;
@@ -485,32 +485,34 @@ function monthCardHtml(person,month,prior){
   var ferSet=FERSETS[year]||(FERSETS[year]=ferienDaysSet(year));
   var today=TODAY;
   var dim=daysInMonth(year,month);
-  var firstDow=(new Date(year,month,1).getDay()+6)%7;
-  var bdayMap = bdayMMDD(person.birthday);
+  var firstDow=(new Date(year,month,1).getDay()+6)%7; // Mo=0
+  var bdayMap=bdayMMDD(person.birthday);
 
-  var h='<div class="month"><h4>'+MONTHS_FULL[month]+'</h4>';
-  h+='<div class="monthgriddays">';
-  // Kopfzeile (8 Zellen: KW + Wochentage)
-  h+='<div class="dowhead kwhead">KW</div>';
-  for(var w=0;w<7;w++) h+='<div class="dowhead">'+WD_MON[w]+'</div>';
-
-  // Tage in ein flaches Raster (führende Leerzellen + Tage + Auffüllen auf volle Wochen)
+  // Tage in Wochenzeilen aufteilen
   var cells=[];
-  for(var e=0;e<firstDow;e++) cells.push(null);
+  for(var i=0;i<firstDow;i++) cells.push(null);
   for(var d=1;d<=dim;d++) cells.push(d);
   while(cells.length%7!==0) cells.push(null);
+  var weeks=cells.length/7;
 
-  var numWeeks=cells.length/7;
-  for(var wk=0;wk<numWeeks;wk++){
-    // KW-Zelle links
-    var kw="", kwColor="";
+  var h='<div class="month"><h4>'+MONTHS_FULL[month]+' '+year+'</h4>';
+  h+='<table class="mtable"><thead><tr><th class="kwh">KW</th>';
+  for(var w=0;w<7;w++) h+='<th>'+WD_MON[w]+'</th>';
+  h+='</tr></thead><tbody>';
+
+  for(var wk=0;wk<weeks;wk++){
+    // KW aus erstem realen Tag der Zeile
+    var kw=null;
     for(var c=0;c<7;c++){ var dd=cells[wk*7+c]; if(dd!==null){ kw=isoWeek(year,month,dd); break; } }
-    if(kw!==""){ kwColor=(kw%2===0)?COL.kwA:COL.kwB; }
-    h+='<div class="cellbox kwcell'+(kw===""?" empty":"")+'" style="background:'+(kwColor||"transparent")+';">'+(kw!==""?kw:"")+'</div>';
+    var kwBg = (kw!==null) ? ((kw%2===0)?COL.kwA:COL.kwB) : "transparent";
+    h+='<tr>';
+    // KW-Zelle
+    if(kw!==null) h+='<td><div class="mcell kw" style="background:'+kwBg+';">'+kw+'</div></td>';
+    else h+='<td></td>';
     // 7 Tageszellen
     for(var cc=0;cc<7;cc++){
       var day=cells[wk*7+cc];
-      if(day===null){ h+='<div class="cellbox day empty"></div>'; continue; }
+      if(day===null){ h+='<td></td>'; continue; }
       var ds=iso(year,month,day);
       var dow=new Date(year,month,day).getDay();
       var isWe=(dow===0||dow===6);
@@ -519,23 +521,26 @@ function monthCardHtml(person,month,prior){
       var isUrl=person.urlaub.indexOf(ds)>=0;
       var isRepeat=isUrl && !!prior[ds.slice(5)];
       var isTod=(ds===today);
-      var isBday = bdayMap && (ds.slice(5)===bdayMap);
+      var isBday=bdayMap && (ds.slice(5)===bdayMap);
 
       var bg="#fff",color=COL.ink,fw="600";
-      if(isWe){ bg=COL.weekend; color=COL.muted||"#9a8d7f"; }
+      if(isWe){ bg=COL.weekend; color=COL.muted; }
       if(isFer){ bg=COL.ferien; color=COL.ink; }
       if(ftName){ bg="#4a4038"; color="#fff"; fw="700"; }
       if(isUrl){ bg=COL.berry; color="#fff"; fw="700"; }
       if(isRepeat){ bg=COL.vorjahr; color=COL.ink; fw="700"; }
-      var style="background:"+bg+";color:"+color+";font-weight:"+fw+";";
-      if(isTod) style+="border:3px solid "+COL.today+";";
-      if(isRepeat) style+="box-shadow:inset 0 0 0 3px "+COL.vorjahrLine+";";
-      if(isFer&&isUrl&&!isRepeat) style+="background-image:repeating-linear-gradient(45deg,"+COL.berry+","+COL.berry+" 6px,"+COL.ferien+" 6px,"+COL.ferien+" 12px);";
-      var title=ftName?ftName:(isBday?"Geburtstag":(isRepeat?"Selber Tag wie im Vorjahr":""));
-      h+='<div class="cellbox day" data-day="'+ds+'" data-person="'+person.id+'" style="'+style+'" title="'+esc(title)+'">'+day+(isRepeat?'<span class="rep" style="color:'+COL.taupe+';">↻</span>':'')+(isBday?sprinkleSvg():'')+'</div>';
+      var st="background:"+bg+";color:"+color+";font-weight:"+fw+";";
+      if(isTod) st+="outline:2px solid "+COL.today+";outline-offset:-2px;";
+      if(isRepeat) st+="box-shadow:inset 0 0 0 2px "+COL.vorjahrLine+";";
+      if(isFer&&isUrl&&!isRepeat) st+="background-image:repeating-linear-gradient(45deg,"+COL.berry+","+COL.berry+" 5px,"+COL.ferien+" 5px,"+COL.ferien+" 10px);";
+      var title=ftName?ftName:(isBday?"Geburtstag":(isRepeat?"wie im Vorjahr":""));
+      h+='<td><div class="mcell day" data-day="'+ds+'" data-person="'+person.id+'" style="'+st+'" title="'+esc(title)+'">'+day
+        +(isRepeat?'<span class="rep" style="color:'+COL.taupe+';">↻</span>':'')
+        +(isBday?sprinkleSvg():'')+'</div></td>';
     }
+    h+='</tr>';
   }
-  h+='</div>';
+  h+='</tbody></table></div>';
   return h;
 }
 
@@ -635,7 +640,13 @@ function tableHtml(){
       if(frline) nameStyle+="border-left:5px solid "+frline+";";
       var used=zaehleUrlaub(emp,year), over=used>lim, tight=!over&&(lim-used)<=3;
       h+='<tr>';
-      h+='<td class="name" style="'+nameStyle+'">'+esc(emp.name)+(emp.fach?'<small>'+emp.fach+(emp.behinderung&&emp.zusatzurlaub>0?' · +'+emp.zusatzurlaub+' Urlaub':'')+'</small>':(emp.behinderung&&emp.zusatzurlaub>0?'<small>+'+emp.zusatzurlaub+' Urlaub</small>':''))+'</td>';
+      var schList=getSchichten();
+      var schSel='<select class="rowShift" data-emp="'+emp.id+'" style="font-size:11px;padding:3px 5px;margin-top:4px;border-radius:6px;border:1px solid var(--line);max-width:130px;"'+(emp.me||emp.azubi?' disabled':'')+'>';
+      schSel+='<option value="">'+(emp.me?'Leitung':(emp.azubi?'Azubi':'— keine —'))+'</option>';
+      for(var ss=0;ss<schList.length;ss++) schSel+='<option value="'+esc(schList[ss])+'"'+(emp.schicht===schList[ss]?' selected':'')+'>'+esc(schList[ss])+'</option>';
+      schSel+='</select>';
+      var extra=(emp.behinderung&&emp.zusatzurlaub>0?' · +'+emp.zusatzurlaub+' Urlaub':'');
+      h+='<td class="name" style="'+nameStyle+'">'+esc(emp.name)+'<small>'+(emp.fach?emp.fach+extra:(extra?extra.replace(' · ',''):''))+'</small>'+(emp.me||emp.azubi?'':schSel)+'</td>';
       var uStyle= over?"background:"+COL.over+";color:#fff;":(tight?"background:"+COL.overBg+";color:"+COL.over+";":"");
       h+='<td class="ucell" style="'+uStyle+'" title="'+used+' von '+lim+' Tagen">'+used+'/'+lim+(over?' ⚠':'')+'</td>';
       for(w=0;w<weeks.length;w++){
@@ -758,11 +769,14 @@ function renderBday(){
 }
 
 /* ====================== MODAL ====================== */
+function numVal(v){ var n=parseInt(v,10); return (isNaN(n)||n<0)?0:n; }
 function counterHtml(id,label,val){
-  return '<div class="counter"><span class="clabel">'+label+'</span><span class="cctrl"><button type="button" class="cbtn" data-dec="'+id+'">–</button><input type="number" min="0" id="'+id+'" class="cnum" value="'+val+'"><button type="button" class="cbtn" data-inc="'+id+'">+</button></span></div>';
+  var v=numVal(val);
+  return '<div class="counter"><span class="clabel">'+label+'</span><span class="cctrl"><button type="button" class="cbtn" data-dec="'+id+'">–</button><input type="number" min="0" id="'+id+'" class="cnum" value="'+v+'"><button type="button" class="cbtn" data-inc="'+id+'">+</button></span></div>';
 }
 function chkHtml(id,on,label){
-  return '<label class="chk'+(on?' on':'')+'" data-for="'+id+'"><input type="checkbox" id="'+id+'"'+(on?' checked':'')+'> <span>'+label+'</span></label>';
+  var checked = (on===true || on==="true" || on===1);
+  return '<label class="chk'+(checked?' on':'')+'" data-for="'+id+'"><input type="checkbox" id="'+id+'"'+(checked?' checked':'')+'> <span>'+label+'</span></label>';
 }
 function openEdit(id){
   var emps=STATE.data.employees,emp=null;
@@ -783,11 +797,14 @@ function openEdit(id){
   h+=chkHtml("mAzubi",emp.azubi,"Auszubildende:r");
   h+=chkHtml("mVollzeit",emp.vollzeit,"Vollzeit");
   h+=chkHtml("mTeilzeit",emp.teilzeit,"Teilzeit");
-  h+=counterHtml("mKinder","Anzahl Kinder",emp.kinder||0);
-  h+=counterHtml("mPflege","Pflegebedürftige Angehörige",emp.pflege||0);
-  h+=counterHtml("mBR","Betriebsrat (Anzahl Ämter)",emp.betriebsrat||0);
-  h+=chkHtml("mBehind","Schwerbehinderung / Grad (GdB)",emp.behinderung);
-  h+='<div id="mZusatzWrap" style="'+(emp.behinderung?'':'display:none;')+'">'+counterHtml("mZusatz","Zusätzliche Urlaubstage (auf 30 addiert)",emp.zusatzurlaub||0)+'</div>';
+  h+=counterHtml("mKinder","Anzahl Kinder",numVal(emp.kinder));
+  h+=counterHtml("mPflege","Pflegebedürftige Angehörige",numVal(emp.pflege));
+  h+=counterHtml("mBR","Betriebsrat (Anzahl Ämter)",numVal(emp.betriebsrat));
+  h+=chkHtml("mBehind",!!emp.behinderung,"Schwerbehinderung (Grad der Behinderung)");
+  h+='<div id="mZusatzWrap" style="'+(emp.behinderung?'':'display:none;')+'padding-left:4px;border-left:3px solid var(--berry-l);margin-left:2px;">';
+  h+=counterHtml("mGdB","Grad der Behinderung (GdB)",numVal(emp.gdb));
+  h+=counterHtml("mZusatz","Zusätzliche Urlaubstage (auf 30 addiert)",numVal(emp.zusatzurlaub));
+  h+='</div>';
   h+='<div><label class="lbl">Geburtstag (Jahr egal)</label><input type="date" id="mBday" value="'+initDate+'"></div>';
   h+='</div><div class="actions"><button class="btn ghost" id="mCancel">Abbrechen</button><button class="btn" id="mSave">Speichern</button></div></div>';
   overlay.innerHTML=h;
@@ -823,6 +840,7 @@ function openEdit(id){
     emp.betriebsrat=Math.max(0,parseInt(document.getElementById("mBR").value,10)||0);
     emp.schicht=document.getElementById("mSchicht").value;
     emp.behinderung=document.getElementById("mBehind").checked;
+    emp.gdb=emp.behinderung?Math.max(0,parseInt(document.getElementById("mGdB").value,10)||0):0;
     emp.zusatzurlaub=emp.behinderung?Math.max(0,parseInt(document.getElementById("mZusatz").value,10)||0):0;
     var bday=document.getElementById("mBday").value, b="";
     if(bday){ var p=bday.split("-"); b=p[1]+"-"+p[2]; }
@@ -839,6 +857,12 @@ function bindEvents(){
   var sp=document.getElementById("selPerson"); if(sp) sp.addEventListener("change",function(){ STATE.selPerson=sp.value; render(); });
   app.querySelectorAll("[data-day]").forEach(function(c){ c.addEventListener("click",function(){ toggleDay(c.getAttribute("data-person"),c.getAttribute("data-day")); }); });
   app.querySelectorAll("[data-edit]").forEach(function(b){ b.addEventListener("click",function(){ openEdit(b.getAttribute("data-edit")); }); });
+  app.querySelectorAll(".rowShift").forEach(function(sel){ sel.addEventListener("change",function(){
+    var eid=sel.getAttribute("data-emp");
+    var emps=STATE.data.employees;
+    for(var i=0;i<emps.length;i++){ if(emps[i].id===eid){ emps[i].schicht=sel.value; break; } }
+    saveData(); render();
+  }); });
   app.querySelectorAll("[data-del]").forEach(function(b){ b.addEventListener("click",function(){
     var id=b.getAttribute("data-del"),emps=STATE.data.employees,nm="";
     for(var i=0;i<emps.length;i++) if(emps[i].id===id) nm=emps[i].name;
