@@ -54,13 +54,13 @@
   .monthgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 22px; padding: 20px; }
   .month { border: 1.5px solid var(--line); border-radius: var(--radius); padding: 16px; background: var(--white); box-shadow: var(--shadow); }
   .month h4 { font-family: 'Caveat', cursive; font-size: 26px; margin: 0 0 12px; text-align: center; color: var(--berry); font-weight: 700; }
-  .mrow { display: grid; grid-template-columns: repeat(8,1fr); gap: 5px; align-items: stretch; }
-  .dowrow { margin-bottom: 6px; }
-  .dowrow span { text-align: center; font-size: 11px; color: var(--muted); font-weight: 700; padding: 2px 0; display: flex; align-items: center; justify-content: center; }
-  .dowrow .kwhead { font-size: 10px; color: var(--taupe); }
-  .weekrow { margin-bottom: 5px; }
-  .kwcell { font-size: 12px; font-weight: 700; color: var(--taupe-d); display: flex; align-items: center; justify-content: center; border-radius: var(--radius-sm); min-height: 40px; border: 1.5px solid var(--line); }
-  .day { min-height: 40px; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; user-select: none; position: relative; border: 1.5px solid var(--line); font-weight: 600; background: var(--white); border-radius: var(--radius-sm); }
+  .monthgriddays { display: grid; grid-template-columns: repeat(8, 1fr); gap: 5px; }
+  .dowhead { text-align: center; font-size: 11px; color: var(--muted); font-weight: 700; display: flex; align-items: center; justify-content: center; padding-bottom: 2px; }
+  .dowhead.kwhead { font-size: 10px; color: var(--taupe); }
+  .cellbox { aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; font-size: 14px; position: relative; border-radius: var(--radius-sm); font-weight: 600; }
+  .kwcell { color: var(--taupe-d); font-size: 12px; font-weight: 700; border: 1.5px solid var(--line); }
+  .kwcell.empty { border: none; background: transparent !important; }
+  .day { cursor: pointer; user-select: none; border: 1.5px solid var(--line); background: var(--white); }
   .day.empty { border: none; cursor: default; background: transparent; }
   .day .rep { position: absolute; top: 2px; right: 3px; font-size: 9px; font-weight: 800; line-height: 1; }
   .sprinkle { position: absolute; inset: -3px; border-radius: 13px; pointer-events: none; z-index: 3; }
@@ -164,7 +164,11 @@ function mk(id,name,opts){
   for(var k in opts) e[k]=opts[k];
   return e;
 }
-var SCHICHTEN = ["Schicht 1","Schicht 2"];
+var DEFAULT_SCHICHTEN = ["Schicht 1","Schicht 2"];
+function getSchichten(){
+  if(STATE.data && Array.isArray(STATE.data.schichten)) return STATE.data.schichten;
+  return DEFAULT_SCHICHTEN;
+}
 var DEFAULT_EMP = [
   { id:"me", name:"Jennifer Hebling (VK2-Leitung)", me:true, birthday:"", urlaub:[], azubi:false, teilzeit:false, vollzeit:true, fach:"", kinder:0, pflege:0, betriebsrat:0, schicht:"", behinderung:false, zusatzurlaub:0 },
   mk("e1","Amy Lee",{azubi:true,fach:"Elektro"}),
@@ -339,12 +343,13 @@ function normalizeEmp(e){
 }
 function applyData(d){
   for(var i=0;i<d.employees.length;i++) normalizeEmp(d.employees[i]);
+  if(!Array.isArray(d.schichten)) d.schichten = DEFAULT_SCHICHTEN.slice();
   STATE.data=d;
 }
 function initData(){
   var d=loadLocal();
   if(!d){
-    d={employees:DEFAULT_EMP.slice(),layout:LAYOUT_VERSION};
+    d={employees:DEFAULT_EMP.slice(),schichten:DEFAULT_SCHICHTEN.slice(),layout:LAYOUT_VERSION};
     applyData(d); saveLocal();
   } else {
     var hatPlatzhalter=false,i;
@@ -480,27 +485,28 @@ function monthCardHtml(person,month,prior){
   var bdayMap = bdayMMDD(person.birthday);
 
   var h='<div class="month"><h4>'+MONTHS_FULL[month]+'</h4>';
-  // Kopfzeile: KW + Wochentage
-  h+='<div class="mrow dowrow"><span class="kwhead">KW</span>';
-  for(var w=0;w<7;w++) h+='<span>'+WD_MON[w]+'</span>';
-  h+='</div>';
+  h+='<div class="monthgriddays">';
+  // Kopfzeile (8 Zellen: KW + Wochentage)
+  h+='<div class="dowhead kwhead">KW</div>';
+  for(var w=0;w<7;w++) h+='<div class="dowhead">'+WD_MON[w]+'</div>';
 
-  // Zellen in Wochenzeilen aufbauen (jeweils 7 Spalten, links KW)
+  // Tage in ein flaches Raster (führende Leerzellen + Tage + Auffüllen auf volle Wochen)
   var cells=[];
   for(var e=0;e<firstDow;e++) cells.push(null);
   for(var d=1;d<=dim;d++) cells.push(d);
   while(cells.length%7!==0) cells.push(null);
 
-  for(var wk=0;wk<cells.length/7;wk++){
-    // KW aus dem ersten realen Tag der Zeile bestimmen
+  var numWeeks=cells.length/7;
+  for(var wk=0;wk<numWeeks;wk++){
+    // KW-Zelle links
     var kw="", kwColor="";
     for(var c=0;c<7;c++){ var dd=cells[wk*7+c]; if(dd!==null){ kw=isoWeek(year,month,dd); break; } }
-    if(kw!==""){ kwColor = (kw%2===0)?COL.kwA:COL.kwB; }
-    h+='<div class="mrow weekrow">';
-    h+='<div class="kwcell'+(kw===""?" empty":"")+'" style="background:'+(kwColor||"transparent")+';'+(kw===""?"border:none;":"")+'">'+(kw!==""?kw:"")+'</div>';
+    if(kw!==""){ kwColor=(kw%2===0)?COL.kwA:COL.kwB; }
+    h+='<div class="cellbox kwcell'+(kw===""?" empty":"")+'" style="background:'+(kwColor||"transparent")+';">'+(kw!==""?kw:"")+'</div>';
+    // 7 Tageszellen
     for(var cc=0;cc<7;cc++){
       var day=cells[wk*7+cc];
-      if(day===null){ h+='<div class="day empty"></div>'; continue; }
+      if(day===null){ h+='<div class="cellbox day empty"></div>'; continue; }
       var ds=iso(year,month,day);
       var dow=new Date(year,month,day).getDay();
       var isWe=(dow===0||dow===6);
@@ -521,11 +527,9 @@ function monthCardHtml(person,month,prior){
       if(isTod) style+="border:3px solid "+COL.today+";";
       if(isRepeat) style+="box-shadow:inset 0 0 0 3px "+COL.vorjahrLine+";";
       if(isFer&&isUrl&&!isRepeat) style+="background-image:repeating-linear-gradient(45deg,"+COL.berry+","+COL.berry+" 6px,"+COL.ferien+" 6px,"+COL.ferien+" 12px);";
-      var cls="day"+(isBday?" hasbday":"");
       var title=ftName?ftName:(isBday?"Geburtstag":(isRepeat?"Selber Tag wie im Vorjahr":""));
-      h+='<div class="'+cls+'" data-day="'+ds+'" data-person="'+person.id+'" style="'+style+'" title="'+esc(title)+'">'+day+(isRepeat?'<span class="rep" style="color:'+COL.taupe+';">↻</span>':'')+(isBday?sprinkleSvg():'')+'</div>';
+      h+='<div class="cellbox day" data-day="'+ds+'" data-person="'+person.id+'" style="'+style+'" title="'+esc(title)+'">'+day+(isRepeat?'<span class="rep" style="color:'+COL.taupe+';">↻</span>':'')+(isBday?sprinkleSvg():'')+'</div>';
     }
-    h+='</div>';
   }
   h+='</div>';
   return h;
@@ -569,8 +573,9 @@ function weekHasFerien(year,kw){
 /* Mitarbeiter nach Schichten gruppieren, in gewünschter Reihenfolge */
 function groupBySchicht(emps){
   var groups=[];
+  var schichten=getSchichten();
   var leitung=[], azubis=[], byShift={}, ohne=[];
-  SCHICHTEN.forEach(function(s){ byShift[s]=[]; });
+  schichten.forEach(function(s){ byShift[s]=[]; });
   for(var i=0;i<emps.length;i++){
     var e=emps[i];
     if(e.me) leitung.push(e);
@@ -580,7 +585,7 @@ function groupBySchicht(emps){
   }
   if(leitung.length) groups.push({title:"Leitung", items:leitung});
   if(azubis.length) groups.push({title:"Auszubildende", items:azubis});
-  SCHICHTEN.forEach(function(s){ if(byShift[s].length) groups.push({title:s, items:byShift[s]}); });
+  schichten.forEach(function(s){ if(byShift[s].length) groups.push({title:s, items:byShift[s]}); });
   if(ohne.length) groups.push({title:"Ohne Schicht", items:ohne});
   return groups;
 }
@@ -685,6 +690,24 @@ function renderTeam(){
   h+='</div>';
   h+='<div style="margin-top:16px;"><button class="btn" id="addPerson">+ Person hinzufügen</button></div>';
 
+  // Schichten-Verwaltung
+  var schichten=getSchichten();
+  h+='<div class="exportbox"><h3>Schichten verwalten</h3>';
+  h+='<p class="sub" style="margin-bottom:10px;">Lege fest, welche Schichten es gibt. Mitarbeiter ordnest du über „Bearbeiten" einer Schicht zu. Umbenennen verschiebt zugeordnete Mitarbeiter automatisch mit.</p>';
+  h+='<div id="schichtList">';
+  for(var si=0;si<schichten.length;si++){
+    h+='<div class="emprow" style="border-bottom:1px solid var(--line);">';
+    h+='<input type="text" class="schichtName" data-idx="'+si+'" value="'+esc(schichten[si])+'" style="flex:1;min-width:160px;">';
+    h+='<button class="btn ghost sm" data-schicht-save="'+si+'">Umbenennen</button>';
+    h+='<button class="btn red-ghost" data-schicht-del="'+si+'">Entfernen</button>';
+    h+='</div>';
+  }
+  h+='</div>';
+  h+='<div class="exportrow" style="margin-top:12px;">';
+  h+='<input type="text" id="newSchicht" placeholder="Neue Schicht, z. B. Frühschicht" style="flex:1;min-width:200px;">';
+  h+='<button class="btn taupe" id="addSchicht">+ Schicht anlegen</button>';
+  h+='</div></div>';
+
   // Cloud-Sync
   var st = SYNC_STATUS, on = syncEnabled();
   var stLabel = !on ? "nicht verbunden" : (st==="ok"?"verbunden ✓":(st==="saving"?"speichert…":(st==="loading"?"lädt…":(st==="error"?"Fehler":"bereit"))));
@@ -750,7 +773,8 @@ function openEdit(id){
   for(var f=0;f<FACHBEREICHE.length;f++) h+='<option value="'+FACHBEREICHE[f]+'"'+(emp.fach===FACHBEREICHE[f]?' selected':'')+'>'+FACHBEREICHE[f]+'</option>';
   h+='</select></div>';
   h+='<div><label class="lbl">Schicht</label><select id="mSchicht"><option value="">— keine Schicht —</option>';
-  for(var sc=0;sc<SCHICHTEN.length;sc++) h+='<option value="'+SCHICHTEN[sc]+'"'+(emp.schicht===SCHICHTEN[sc]?' selected':'')+'>'+SCHICHTEN[sc]+'</option>';
+  var _schichten=getSchichten();
+  for(var sc=0;sc<_schichten.length;sc++) h+='<option value="'+esc(_schichten[sc])+'"'+(emp.schicht===_schichten[sc]?' selected':'')+'>'+esc(_schichten[sc])+'</option>';
   h+='</select></div>';
   h+=chkHtml("mAzubi",emp.azubi,"Auszubildende:r");
   h+=chkHtml("mVollzeit",emp.vollzeit,"Vollzeit");
@@ -818,6 +842,41 @@ function bindEvents(){
   }); });
   var add=document.getElementById("addPerson");
   if(add) add.addEventListener("click",function(){ var id="e"+Date.now(); STATE.data.employees.push(mk(id,"Neuer Mitarbeiter",{})); saveData(); render(); });
+
+  // Schichten verwalten
+  var addS=document.getElementById("addSchicht");
+  if(addS) addS.addEventListener("click",function(){
+    var v=document.getElementById("newSchicht").value.trim();
+    if(!v) return;
+    if(!Array.isArray(STATE.data.schichten)) STATE.data.schichten=DEFAULT_SCHICHTEN.slice();
+    if(STATE.data.schichten.indexOf(v)>=0){ alert("Diese Schicht gibt es schon."); return; }
+    STATE.data.schichten.push(v); saveData(); render();
+  });
+  document.querySelectorAll("[data-schicht-save]").forEach(function(b){ b.addEventListener("click",function(){
+    var idx=parseInt(b.getAttribute("data-schicht-save"),10);
+    var inp=document.querySelector('.schichtName[data-idx="'+idx+'"]');
+    if(!inp) return;
+    var neu=inp.value.trim(); if(!neu) return;
+    var alt=STATE.data.schichten[idx];
+    if(neu===alt) return;
+    if(STATE.data.schichten.indexOf(neu)>=0){ alert("Diese Schicht gibt es schon."); return; }
+    // Mitarbeiter mit alter Schicht auf neuen Namen umziehen
+    STATE.data.employees.forEach(function(e){ if(e.schicht===alt) e.schicht=neu; });
+    STATE.data.schichten[idx]=neu;
+    saveData(); render();
+  }); });
+  document.querySelectorAll("[data-schicht-del]").forEach(function(b){ b.addEventListener("click",function(){
+    var idx=parseInt(b.getAttribute("data-schicht-del"),10);
+    var name=STATE.data.schichten[idx];
+    var anzahl=STATE.data.employees.filter(function(e){ return e.schicht===name; }).length;
+    var msg="Schicht \""+name+"\" entfernen?";
+    if(anzahl>0) msg+="\n\n"+anzahl+" Mitarbeiter stehen dann auf keine Schicht.";
+    if(confirm(msg)){
+      STATE.data.employees.forEach(function(e){ if(e.schicht===name) e.schicht=""; });
+      STATE.data.schichten.splice(idx,1);
+      saveData(); render();
+    }
+  }); });
 
   var ex=document.getElementById("btnExport"); if(ex) ex.addEventListener("click",exportToFile);
   var im=document.getElementById("btnImport"), fi=document.getElementById("fileImport");
