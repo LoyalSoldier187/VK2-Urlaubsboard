@@ -54,12 +54,12 @@
   .monthgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 22px; padding: 20px; }
   .month { border: 1.5px solid var(--line); border-radius: var(--radius); padding: 16px; background: var(--white); box-shadow: var(--shadow); }
   .month h4 { font-family: 'Caveat', cursive; font-size: 26px; margin: 0 0 12px; text-align: center; color: var(--berry); font-weight: 700; }
-  .mrow { display: grid; grid-template-columns: 30px repeat(7,1fr); gap: 5px; align-items: stretch; }
+  .mrow { display: grid; grid-template-columns: repeat(8,1fr); gap: 5px; align-items: stretch; }
   .dowrow { margin-bottom: 6px; }
   .dowrow span { text-align: center; font-size: 11px; color: var(--muted); font-weight: 700; padding: 2px 0; display: flex; align-items: center; justify-content: center; }
   .dowrow .kwhead { font-size: 10px; color: var(--taupe); }
   .weekrow { margin-bottom: 5px; }
-  .kwcell { font-size: 11px; font-weight: 700; color: var(--taupe-d); display: flex; align-items: center; justify-content: center; border-radius: 6px; }
+  .kwcell { font-size: 12px; font-weight: 700; color: var(--taupe-d); display: flex; align-items: center; justify-content: center; border-radius: var(--radius-sm); min-height: 40px; border: 1.5px solid var(--line); }
   .day { min-height: 40px; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; user-select: none; position: relative; border: 1.5px solid var(--line); font-weight: 600; background: var(--white); border-radius: var(--radius-sm); }
   .day.empty { border: none; cursor: default; background: transparent; }
   .day .rep { position: absolute; top: 2px; right: 3px; font-size: 9px; font-weight: 800; line-height: 1; }
@@ -133,6 +133,7 @@ var MONTHS_FULL = ["Januar","Februar","März","April","Mai","Juni","Juli","Augus
 var WD = ["S","M","D","M","D","F","S"];
 var WD_MON = ["Mo","Di","Mi","Do","Fr","Sa","So"];
 var URLAUBS_LIMIT = 30;
+function limitFor(emp){ return URLAUBS_LIMIT + (emp && emp.behinderung && emp.zusatzurlaub>0 ? emp.zusatzurlaub : 0); }
 
 var FACHBEREICHE = ["Elektro","Eisenwaren","Sanitär"];
 var FACH_FARBE = { "Elektro":"#a86b7e", "Eisenwaren":"#b8a894", "Sanitär":"#8f8071" };
@@ -159,25 +160,27 @@ var FEIERTAGE = {
 };
 
 function mk(id,name,opts){
-  var e={id:id,name:name,me:false,birthday:"",urlaub:[],azubi:false,teilzeit:false,vollzeit:false,fach:"",kinder:0,pflege:0,betriebsrat:0};
+  var e={id:id,name:name,me:false,birthday:"",urlaub:[],azubi:false,teilzeit:false,vollzeit:false,fach:"",kinder:0,pflege:0,betriebsrat:0,schicht:"",behinderung:false,zusatzurlaub:0};
   for(var k in opts) e[k]=opts[k];
   return e;
 }
+var SCHICHTEN = ["Schicht 1","Schicht 2"];
 var DEFAULT_EMP = [
-  { id:"me", name:"Jennifer Hebling (VK2-Leitung)", me:true, birthday:"", urlaub:[], azubi:false, teilzeit:false, vollzeit:true, fach:"", kinder:0, pflege:0, betriebsrat:0 },
+  { id:"me", name:"Jennifer Hebling (VK2-Leitung)", me:true, birthday:"", urlaub:[], azubi:false, teilzeit:false, vollzeit:true, fach:"", kinder:0, pflege:0, betriebsrat:0, schicht:"", behinderung:false, zusatzurlaub:0 },
   mk("e1","Amy Lee",{azubi:true,fach:"Elektro"}),
-  mk("e3","Philipp Warkus",{azubi:true,fach:"Sanitär"}),
-  mk("e9","Christian Beck",{vollzeit:true,fach:"Eisenwaren"}),
-  mk("e8","Ralf Weigel",{vollzeit:true,fach:"Eisenwaren"}),
-  mk("e2","Birgit Trüller",{teilzeit:true,fach:"Elektro"}),
-  mk("e10","Lin Berisha",{teilzeit:true,fach:"Elektro"}),
-  mk("e11","Lisa Freund",{vollzeit:true,fach:"Elektro"}),
-  mk("e7","Marius Kolja Rieger",{vollzeit:true,fach:"Elektro"}),
-  mk("e5","Irene Heilmann",{vollzeit:true,fach:"Sanitär"}),
-  mk("e6","Karin Kuhl",{teilzeit:true,fach:"Sanitär"}),
-  mk("e4","Michael Gössl",{vollzeit:true,fach:"Sanitär"}),
-  mk("e13","Monika Peters",{vollzeit:true,fach:"Sanitär"}),
-  mk("e12","Stefan Lautenschläger",{vollzeit:true,fach:"Sanitär"})
+  mk("e3","Philipp Warkus",{azubi:true,fach:"Sanitär",schicht:"Schicht 1"}),
+  mk("e9","Christian Beck",{vollzeit:true,fach:"Eisenwaren",schicht:"Schicht 1"}),
+  mk("e10","Lin Berisha",{teilzeit:true,fach:"Elektro",schicht:"Schicht 1"}),
+  mk("e14","Sebastian Stöhr",{vollzeit:true,fach:"",schicht:"Schicht 1"}),
+  mk("e6","Karin Kuhl",{teilzeit:true,fach:"Sanitär",schicht:"Schicht 1"}),
+  mk("e7","Marius Kolja Rieger",{vollzeit:true,fach:"Elektro",schicht:"Schicht 1"}),
+  mk("e11","Lisa Freund",{vollzeit:true,fach:"Elektro",schicht:"Schicht 2"}),
+  mk("e5","Irene Heilmann",{vollzeit:true,fach:"Sanitär",schicht:"Schicht 2"}),
+  mk("e12","Stefan Lautenschläger",{vollzeit:true,fach:"Sanitär",schicht:"Schicht 2"}),
+  mk("e13","Monika Peters",{vollzeit:true,fach:"Sanitär",schicht:"Schicht 2"}),
+  mk("e2","Birgit Trüller",{teilzeit:true,fach:"Elektro",schicht:"Schicht 2"}),
+  mk("e8","Ralf Weigel",{vollzeit:true,fach:"Eisenwaren",schicht:"Schicht 2"}),
+  mk("e4","Michael Gössl",{vollzeit:true,fach:"Sanitär",schicht:""})
 ];
 
 /* ====================== HILFSFUNKTIONEN ====================== */
@@ -234,30 +237,48 @@ var CFGKEY = "vk2:sync";
 function loadLocal(){ try{ var r=localStorage.getItem(KEY); if(r) return JSON.parse(r); }catch(e){} return null; }
 function saveLocal(){ try{ localStorage.setItem(KEY, JSON.stringify(STATE.data)); }catch(e){} }
 
-function loadSyncCfg(){ try{ var r=localStorage.getItem(CFGKEY); if(r) return JSON.parse(r); }catch(e){} return { apiKey:"", binId:"" }; }
+function loadSyncCfg(){ try{ var r=localStorage.getItem(CFGKEY); if(r) return JSON.parse(r); }catch(e){} return { projectId:"", apiKey:"" }; }
 function saveSyncCfg(cfg){ try{ localStorage.setItem(CFGKEY, JSON.stringify(cfg)); }catch(e){} }
 
 var SYNC = loadSyncCfg();
 var SYNC_STATUS = "off"; // off | ok | error | saving | loading
 var pushTimer = null;
+var DOCPATH = "vk2/board"; // Firestore-Collection/Dokument
 
-function syncEnabled(){ return !!(SYNC.apiKey && SYNC.binId); }
+function syncEnabled(){ return !!(SYNC.projectId && SYNC.apiKey); }
+function fireUrl(){
+  return "https://firestore.googleapis.com/v1/projects/"+encodeURIComponent(SYNC.projectId)+
+         "/databases/(default)/documents/"+DOCPATH+"?key="+encodeURIComponent(SYNC.apiKey);
+}
+
+/* Firestore speichert typisierte Felder. Wir legen die Board-Daten als JSON-String
+   in ein einziges Feld "json", das ist am robustesten und einfachsten. */
+function toFirestore(dataObj){
+  return { fields: { json: { stringValue: JSON.stringify(dataObj) } } };
+}
+function fromFirestore(resp){
+  try{
+    if(resp && resp.fields && resp.fields.json && typeof resp.fields.json.stringValue==="string"){
+      var obj = JSON.parse(resp.fields.json.stringValue);
+      return (obj && obj.employees) ? obj : null;
+    }
+  }catch(e){}
+  return null;
+}
 
 /* Von Cloud laden */
 function cloudLoad(cb){
   if(!syncEnabled()){ cb(null); return; }
   SYNC_STATUS="loading";
   var xhr = new XMLHttpRequest();
-  xhr.open("GET","https://api.jsonbin.io/v3/b/"+encodeURIComponent(SYNC.binId)+"/latest",true);
-  xhr.setRequestHeader("X-Master-Key", SYNC.apiKey);
+  xhr.open("GET", fireUrl(), true);
   xhr.onload = function(){
     if(xhr.status>=200 && xhr.status<300){
-      try{
-        var res = JSON.parse(xhr.responseText);
-        var rec = res.record;
-        SYNC_STATUS="ok";
-        cb(rec && rec.employees ? rec : null);
-      }catch(e){ SYNC_STATUS="error"; cb(null); }
+      try{ var res=JSON.parse(xhr.responseText); SYNC_STATUS="ok"; cb(fromFirestore(res)); }
+      catch(e){ SYNC_STATUS="error"; cb(null); }
+    } else if(xhr.status===404){
+      // Dokument existiert noch nicht -> als "leer, aber verbunden" behandeln
+      SYNC_STATUS="ok"; cb(null);
     } else { SYNC_STATUS="error"; cb(null); }
     if(STATE.tab==="team") render();
   };
@@ -274,15 +295,15 @@ function cloudPushNow(){
   if(!syncEnabled()) return;
   SYNC_STATUS="saving"; if(STATE.tab==="team") render();
   var xhr = new XMLHttpRequest();
-  xhr.open("PUT","https://api.jsonbin.io/v3/b/"+encodeURIComponent(SYNC.binId),true);
+  // PATCH legt das Dokument an oder überschreibt es (updateMask auf Feld "json")
+  xhr.open("PATCH", fireUrl()+"&updateMask.fieldPaths=json", true);
   xhr.setRequestHeader("Content-Type","application/json");
-  xhr.setRequestHeader("X-Master-Key", SYNC.apiKey);
   xhr.onload = function(){
     SYNC_STATUS = (xhr.status>=200 && xhr.status<300) ? "ok" : "error";
     if(STATE.tab==="team") render();
   };
   xhr.onerror = function(){ SYNC_STATUS="error"; if(STATE.tab==="team") render(); };
-  xhr.send(JSON.stringify(STATE.data));
+  xhr.send(JSON.stringify(toFirestore(STATE.data)));
 }
 
 /* Zentrales Speichern: lokal sofort, Cloud entprellt */
@@ -301,7 +322,7 @@ var STATE = { data:null, tab:"plan", year:2026, view:"month", selPerson:"me" };
 var FERSETS = {};
 var TODAY = todayISO();
 
-var LAYOUT_VERSION = 5;
+var LAYOUT_VERSION = 6;
 function normalizeEmp(e){
   if(typeof e.kinder!=="number") e.kinder=0;
   if(typeof e.pflege!=="number") e.pflege = (e.pflege===true?1:(typeof e.pflege==="number"?e.pflege:0));
@@ -310,6 +331,9 @@ function normalizeEmp(e){
   if(!("teilzeit" in e)) e.teilzeit=false;
   if(!("vollzeit" in e)) e.vollzeit=false;
   if(!("fach" in e)) e.fach="";
+  if(!("schicht" in e)) e.schicht="";
+  if(!("behinderung" in e)) e.behinderung=false;
+  if(typeof e.zusatzurlaub!=="number") e.zusatzurlaub=0;
   if(!e.urlaub) e.urlaub=[];
   return e;
 }
@@ -333,7 +357,7 @@ function initData(){
       for(i=0;i<DEFAULT_EMP.length;i++){
         var def=DEFAULT_EMP[i],alt=null;
         for(var j=0;j<d.employees.length;j++){ if(d.employees[j].id===def.id){ alt=d.employees[j]; break; } }
-        if(alt){ var c={}; for(var k in def) c[k]=def[k]; c.urlaub=alt.urlaub||[]; c.birthday=alt.birthday||""; if(typeof alt.kinder==="number")c.kinder=alt.kinder; if(typeof alt.betriebsrat==="number")c.betriebsrat=alt.betriebsrat; if(typeof alt.pflege==="number")c.pflege=alt.pflege; neu.push(c); }
+        if(alt){ var c={}; for(var k in def) c[k]=def[k]; c.urlaub=alt.urlaub||[]; c.birthday=alt.birthday||""; if(typeof alt.kinder==="number")c.kinder=alt.kinder; if(typeof alt.betriebsrat==="number")c.betriebsrat=alt.betriebsrat; if(typeof alt.pflege==="number")c.pflege=alt.pflege; if(typeof alt.behinderung==="boolean")c.behinderung=alt.behinderung; if(typeof alt.zusatzurlaub==="number")c.zusatzurlaub=alt.zusatzurlaub; neu.push(c); }
         else neu.push(def);
       }
       d.employees=neu; d.layout=LAYOUT_VERSION;
@@ -426,12 +450,13 @@ function renderPlan(){
     var person=null;
     for(var i=0;i<emps.length;i++){ if(emps[i].id===STATE.selPerson){ person=emps[i]; break; } }
     if(!person) person=emps[0];
-    var used=zaehleUrlaub(person,STATE.year), rest=URLAUBS_LIMIT-used, over=used>URLAUBS_LIMIT;
+    var lim=limitFor(person);
+    var used=zaehleUrlaub(person,STATE.year), rest=lim-used, over=used>lim;
     h+='<div class="personbar"><label>Person:</label><select id="selPerson">';
     for(var j=0;j<emps.length;j++) h+='<option value="'+emps[j].id+'"'+(emps[j].id===person.id?' selected':'')+'>'+esc(emps[j].name)+'</option>';
     h+='</select>';
     var cs = over ? "background:"+COL.over+";color:#fff;" : (rest<=3?"background:"+COL.overBg+";color:"+COL.over+";":"background:"+COL.creme+";color:"+COL.ink+";");
-    h+='<span class="cnt" style="'+cs+'">'+used+' / '+URLAUBS_LIMIT+' Urlaubstage '+(over?('· '+(used-URLAUBS_LIMIT)+' zu viel!'):('· '+rest+' übrig'))+'</span>';
+    h+='<span class="cnt" style="'+cs+'">'+used+' / '+lim+' Urlaubstage '+(over?('· '+(used-lim)+' zu viel!'):('· '+rest+' übrig'))+(person.behinderung&&person.zusatzurlaub>0?' (inkl. '+person.zusatzurlaub+' Zusatz)':'')+'</span>';
     var prior=priorYearMMDD(person,STATE.year),rep=0;
     for(var r=0;r<person.urlaub.length;r++){ var du=person.urlaub[r]; if(du.slice(0,4)===String(STATE.year)&&prior[du.slice(5)]) rep++; }
     if(rep>0) h+='<span class="cnt" style="background:'+COL.vorjahr+';color:'+COL.ink+';box-shadow:inset 0 0 0 2px '+COL.vorjahrLine+';">↻ '+rep+' '+(rep===1?'Tag':'Tage')+' wie im Vorjahr</span>';
@@ -472,7 +497,7 @@ function monthCardHtml(person,month,prior){
     for(var c=0;c<7;c++){ var dd=cells[wk*7+c]; if(dd!==null){ kw=isoWeek(year,month,dd); break; } }
     if(kw!==""){ kwColor = (kw%2===0)?COL.kwA:COL.kwB; }
     h+='<div class="mrow weekrow">';
-    h+='<div class="kwcell" style="background:'+(kwColor||"transparent")+';">'+(kw!==""?kw:"")+'</div>';
+    h+='<div class="kwcell'+(kw===""?" empty":"")+'" style="background:'+(kwColor||"transparent")+';'+(kw===""?"border:none;":"")+'">'+(kw!==""?kw:"")+'</div>';
     for(var cc=0;cc<7;cc++){
       var day=cells[wk*7+cc];
       if(day===null){ h+='<div class="day empty"></div>'; continue; }
@@ -535,13 +560,39 @@ function empHasUrlaubInWeek(emp,year,kw){
   }
   return false;
 }
+/* enthält die KW (irgend)einen Ferientag in Hessen? */
+function weekHasFerien(year,kw){
+  var ferSet=FERSETS[year]||(FERSETS[year]=ferienDaysSet(year));
+  for(var ds in ferSet){ if(ds.slice(0,4)===String(year) && isoWeekFromISO(ds)===kw) return true; }
+  return false;
+}
+/* Mitarbeiter nach Schichten gruppieren, in gewünschter Reihenfolge */
+function groupBySchicht(emps){
+  var groups=[];
+  var leitung=[], azubis=[], byShift={}, ohne=[];
+  SCHICHTEN.forEach(function(s){ byShift[s]=[]; });
+  for(var i=0;i<emps.length;i++){
+    var e=emps[i];
+    if(e.me) leitung.push(e);
+    else if(e.azubi) azubis.push(e);
+    else if(e.schicht && byShift[e.schicht]) byShift[e.schicht].push(e);
+    else ohne.push(e);
+  }
+  if(leitung.length) groups.push({title:"Leitung", items:leitung});
+  if(azubis.length) groups.push({title:"Auszubildende", items:azubis});
+  SCHICHTEN.forEach(function(s){ if(byShift[s].length) groups.push({title:s, items:byShift[s]}); });
+  if(ohne.length) groups.push({title:"Ohne Schicht", items:ohne});
+  return groups;
+}
 function tableHtml(){
   var year=STATE.year;
   var emps=STATE.data.employees;
   var weeks=weeksOfYear(year);
   var i,w;
+  var groups=groupBySchicht(emps);
+  var totalCols=weeks.length;
 
-  // Überschneidungen pro KW zählen (wie viele MA in dieser KW Urlaub haben)
+  // Überschneidungen pro KW zählen
   var proKW={};
   for(i=0;i<emps.length;i++){
     for(w=0;w<weeks.length;w++){
@@ -551,48 +602,59 @@ function tableHtml(){
 
   var h='<table class="cal"><thead><tr>';
   h+='<th class="nameh">Mitarbeiter</th>';
-  h+='<th class="uhead">Urlaub<br>/ '+URLAUBS_LIMIT+'</th>';
+  h+='<th class="uhead">Urlaub</th>';
   for(w=0;w<weeks.length;w++){
-    var kwColor=(weeks[w].kw%2===0)?COL.kwA:COL.kwB;
-    h+='<th style="background:'+kwColor+';min-width:40px;">'+weeks[w].kw+'</th>';
+    var ferKW=weekHasFerien(year,weeks[w].kw);
+    var kwColor = ferKW ? COL.ferien : ((weeks[w].kw%2===0)?COL.kwA:COL.kwB);
+    h+='<th style="background:'+kwColor+';min-width:40px;"'+(ferKW?' title="Ferien Hessen"':'')+'>'+weeks[w].kw+'</th>';
   }
   h+='</tr></thead><tbody>';
 
-  for(i=0;i<emps.length;i++){
-    var emp=emps[i];
-    var prior=priorYearMMDD(emp,year);
-    var frline=FACH_ROW[emp.fach];
-    var nameStyle="color:"+(emp.me?COL.berry:COL.ink)+";";
-    if(frline) nameStyle+="border-left:5px solid "+frline+";";
-    var used=zaehleUrlaub(emp,year), over=used>URLAUBS_LIMIT, tight=!over&&(URLAUBS_LIMIT-used)<=3;
-    h+='<tr>';
-    h+='<td class="name" style="'+nameStyle+'">'+esc(emp.name)+(emp.fach?'<small>'+emp.fach+'</small>':'')+'</td>';
-    var uStyle= over?"background:"+COL.over+";color:#fff;":(tight?"background:"+COL.overBg+";color:"+COL.over+";":"");
-    h+='<td class="ucell" style="'+uStyle+'">'+used+(over?' ⚠':'')+'</td>';
-    for(w=0;w<weeks.length;w++){
-      var kw=weeks[w].kw;
-      var kwBg=(kw%2===0)?COL.kwA:COL.kwB;
-      var hasU=empHasUrlaubInWeek(emp,year,kw);
-      // Wiederholung: hatte MA in gleicher KW im Vorjahr Urlaub? (per MM-DD Näherung: irgendein Urlaubstag dieser KW war Vorjahr)
-      var isRepeat=false;
-      if(hasU){
-        for(var uu=0;uu<emp.urlaub.length;uu++){
-          var dsx=emp.urlaub[uu];
-          if(dsx.slice(0,4)===String(year) && isoWeekFromISO(dsx)===kw && prior[dsx.slice(5)]){ isRepeat=true; break; }
+  for(var g=0;g<groups.length;g++){
+    // Schicht-Zwischenüberschrift
+    h+='<tr class="shiftsep"><td class="name shifttitle" style="background:'+COL.creme+';font-family:\'Caveat\',cursive;font-size:20px;color:'+COL.berry+';">'+esc(groups[g].title)+'</td>';
+    h+='<td class="ucell" style="background:'+COL.creme+';"></td>';
+    h+='<td colspan="'+totalCols+'" style="background:'+COL.creme+';"></td></tr>';
+
+    var members=groups[g].items;
+    for(var mi=0;mi<members.length;mi++){
+      var emp=members[mi];
+      var prior=priorYearMMDD(emp,year);
+      var frline=FACH_ROW[emp.fach];
+      var lim=limitFor(emp);
+      var nameStyle="color:"+(emp.me?COL.berry:COL.ink)+";";
+      if(frline) nameStyle+="border-left:5px solid "+frline+";";
+      var used=zaehleUrlaub(emp,year), over=used>lim, tight=!over&&(lim-used)<=3;
+      h+='<tr>';
+      h+='<td class="name" style="'+nameStyle+'">'+esc(emp.name)+(emp.fach?'<small>'+emp.fach+(emp.behinderung&&emp.zusatzurlaub>0?' · +'+emp.zusatzurlaub+' Urlaub':'')+'</small>':(emp.behinderung&&emp.zusatzurlaub>0?'<small>+'+emp.zusatzurlaub+' Urlaub</small>':''))+'</td>';
+      var uStyle= over?"background:"+COL.over+";color:#fff;":(tight?"background:"+COL.overBg+";color:"+COL.over+";":"");
+      h+='<td class="ucell" style="'+uStyle+'" title="'+used+' von '+lim+' Tagen">'+used+'/'+lim+(over?' ⚠':'')+'</td>';
+      for(w=0;w<weeks.length;w++){
+        var kw=weeks[w].kw;
+        var ferKW2=weekHasFerien(year,kw);
+        var kwBg = ferKW2 ? COL.ferien : ((kw%2===0)?COL.kwA:COL.kwB);
+        var hasU=empHasUrlaubInWeek(emp,year,kw);
+        var isRepeat=false;
+        if(hasU){
+          for(var uu=0;uu<emp.urlaub.length;uu++){
+            var dsx=emp.urlaub[uu];
+            if(dsx.slice(0,4)===String(year) && isoWeekFromISO(dsx)===kw && prior[dsx.slice(5)]){ isRepeat=true; break; }
+          }
         }
+        var isOverlap=hasU && (proKW[kw]||0)>=2;
+        var st="min-width:40px;background:"+kwBg+";";
+        if(hasU){ st="min-width:40px;background:"+COL.berry+";"; }
+        if(isRepeat && !isOverlap){ st="min-width:40px;background:"+COL.vorjahr+";box-shadow:inset 0 0 0 2px "+COL.vorjahrLine+";"; }
+        if(isOverlap){ st="min-width:40px;background-image:repeating-linear-gradient(45deg,"+COL.berry+","+COL.berry+" 4px,#fff 4px,#fff 7px);"; }
+        var tip=esc(emp.name)+" · KW "+kw;
+        if(ferKW2) tip+=" · Ferien";
+        if(hasU) tip+=" — Urlaub";
+        if(isOverlap) tip+=" — Überschneidung ("+proKW[kw]+" im Urlaub)";
+        if(isRepeat) tip+=" — wie im Vorjahr";
+        h+='<td class="kwcolcell" style="'+st+'" title="'+tip+'"></td>';
       }
-      var isOverlap=hasU && (proKW[kw]||0)>=2;
-      var st="min-width:40px;background:"+kwBg+";";
-      if(hasU){ st="min-width:40px;background:"+COL.berry+";"; }
-      if(isRepeat && !isOverlap){ st="min-width:40px;background:"+COL.vorjahr+";box-shadow:inset 0 0 0 2px "+COL.vorjahrLine+";"; }
-      if(isOverlap){ st="min-width:40px;background-image:repeating-linear-gradient(45deg,"+COL.berry+","+COL.berry+" 4px,#fff 4px,#fff 7px);"; }
-      var tip=esc(emp.name)+" · KW "+kw;
-      if(hasU) tip+=" — Urlaub";
-      if(isOverlap) tip+=" — Überschneidung ("+proKW[kw]+" im Urlaub)";
-      if(isRepeat) tip+=" — wie im Vorjahr";
-      h+='<td class="kwcolcell" style="'+st+'" title="'+tip+'"></td>';
+      h+='</tr>';
     }
-    h+='</tr>';
   }
   h+='</tbody></table>';
   return h;
@@ -627,10 +689,10 @@ function renderTeam(){
   var st = SYNC_STATUS, on = syncEnabled();
   var stLabel = !on ? "nicht verbunden" : (st==="ok"?"verbunden ✓":(st==="saving"?"speichert…":(st==="loading"?"lädt…":(st==="error"?"Fehler":"bereit"))));
   h+='<div class="syncbox"><h3>Cloud-Synchronisierung</h3>';
-  h+='<p class="sub" style="margin-bottom:10px;">Für Zugriff von Handy <b>und</b> Laptop. Einmalig bei <b>jsonbin.io</b> kostenlos anmelden, dort einen „Bin" anlegen und hier <b>API-Key</b> und <b>Bin-ID</b> eintragen. Danach synchronisiert sich alles automatisch. <span class="syncstate '+(on?'on':'off')+'">'+stLabel+'</span></p>';
+  h+='<p class="sub" style="margin-bottom:10px;">Für Zugriff von Handy <b>und</b> Laptop. Einmalig bei <b>Firebase (Google)</b> ein kostenloses Projekt anlegen, Firestore aktivieren und hier <b>Projekt-ID</b> und <b>Web-API-Key</b> eintragen. Danach synchronisiert sich alles automatisch. <span class="syncstate '+(on?'on':'off')+'">'+stLabel+'</span></p>';
   h+='<div class="syncfields">';
-  h+='<div><label class="lbl">JSONBin API-Key (X-Master-Key)</label><input type="text" id="syncKey" value="'+esc(SYNC.apiKey)+'" placeholder="$2a$10$..." style="width:100%;"></div>';
-  h+='<div><label class="lbl">Bin-ID</label><input type="text" id="syncBin" value="'+esc(SYNC.binId)+'" placeholder="z. B. 65f1a2..." style="width:100%;"></div>';
+  h+='<div><label class="lbl">Firebase Projekt-ID</label><input type="text" id="syncProj" value="'+esc(SYNC.projectId)+'" placeholder="z. B. vk2-urlaubsboard" style="width:100%;"></div>';
+  h+='<div><label class="lbl">Web-API-Key</label><input type="text" id="syncKey" value="'+esc(SYNC.apiKey)+'" placeholder="AIza..." style="width:100%;"></div>';
   h+='</div>';
   h+='<div class="exportrow">';
   h+='<button class="btn" id="syncSave">Verbinden & speichern</button>';
@@ -687,12 +749,17 @@ function openEdit(id){
   h+='<div><label class="lbl">Fachbereich</label><select id="mFach"><option value="">— kein Fachbereich —</option>';
   for(var f=0;f<FACHBEREICHE.length;f++) h+='<option value="'+FACHBEREICHE[f]+'"'+(emp.fach===FACHBEREICHE[f]?' selected':'')+'>'+FACHBEREICHE[f]+'</option>';
   h+='</select></div>';
+  h+='<div><label class="lbl">Schicht</label><select id="mSchicht"><option value="">— keine Schicht —</option>';
+  for(var sc=0;sc<SCHICHTEN.length;sc++) h+='<option value="'+SCHICHTEN[sc]+'"'+(emp.schicht===SCHICHTEN[sc]?' selected':'')+'>'+SCHICHTEN[sc]+'</option>';
+  h+='</select></div>';
   h+=chkHtml("mAzubi",emp.azubi,"Auszubildende:r");
   h+=chkHtml("mVollzeit",emp.vollzeit,"Vollzeit");
   h+=chkHtml("mTeilzeit",emp.teilzeit,"Teilzeit");
   h+=counterHtml("mKinder","Anzahl Kinder",emp.kinder||0);
   h+=counterHtml("mPflege","Pflegebedürftige Angehörige",emp.pflege||0);
   h+=counterHtml("mBR","Betriebsrat (Anzahl Ämter)",emp.betriebsrat||0);
+  h+=chkHtml("mBehind","Schwerbehinderung / Grad (GdB)",emp.behinderung);
+  h+='<div id="mZusatzWrap" style="'+(emp.behinderung?'':'display:none;')+'">'+counterHtml("mZusatz","Zusätzliche Urlaubstage (auf 30 addiert)",emp.zusatzurlaub||0)+'</div>';
   h+='<div><label class="lbl">Geburtstag (Jahr egal)</label><input type="date" id="mBday" value="'+initDate+'"></div>';
   h+='</div><div class="actions"><button class="btn ghost" id="mCancel">Abbrechen</button><button class="btn" id="mSave">Speichern</button></div></div>';
   overlay.innerHTML=h;
@@ -706,6 +773,10 @@ function openEdit(id){
   document.getElementById("mVollzeit").addEventListener("change",function(){ if(this.checked) document.getElementById("mTeilzeit").checked=false; upd(); });
   document.getElementById("mTeilzeit").addEventListener("change",function(){ if(this.checked) document.getElementById("mVollzeit").checked=false; upd(); });
   document.getElementById("mAzubi").addEventListener("change",upd);
+  document.getElementById("mBehind").addEventListener("change",function(){
+    var el=overlay.querySelector('[data-for=mBehind]'); if(el) el.classList.toggle("on", this.checked);
+    document.getElementById("mZusatzWrap").style.display = this.checked ? "" : "none";
+  });
 
   overlay.querySelectorAll("[data-inc]").forEach(function(b){ b.addEventListener("click",function(){ var el=document.getElementById(b.getAttribute("data-inc")); el.value=(parseInt(el.value,10)||0)+1; }); });
   overlay.querySelectorAll("[data-dec]").forEach(function(b){ b.addEventListener("click",function(){ var el=document.getElementById(b.getAttribute("data-dec")); el.value=Math.max(0,(parseInt(el.value,10)||0)-1); }); });
@@ -722,6 +793,9 @@ function openEdit(id){
     emp.kinder=Math.max(0,parseInt(document.getElementById("mKinder").value,10)||0);
     emp.pflege=Math.max(0,parseInt(document.getElementById("mPflege").value,10)||0);
     emp.betriebsrat=Math.max(0,parseInt(document.getElementById("mBR").value,10)||0);
+    emp.schicht=document.getElementById("mSchicht").value;
+    emp.behinderung=document.getElementById("mBehind").checked;
+    emp.zusatzurlaub=emp.behinderung?Math.max(0,parseInt(document.getElementById("mZusatz").value,10)||0):0;
     var bday=document.getElementById("mBday").value, b="";
     if(bday){ var p=bday.split("-"); b=p[1]+"-"+p[2]; }
     emp.birthday=b;
@@ -766,25 +840,25 @@ function bindEvents(){
   // Sync-Buttons
   var sk=document.getElementById("syncSave");
   if(sk) sk.addEventListener("click",function(){
+    SYNC.projectId=document.getElementById("syncProj").value.trim();
     SYNC.apiKey=document.getElementById("syncKey").value.trim();
-    SYNC.binId=document.getElementById("syncBin").value.trim();
     saveSyncCfg(SYNC);
     if(syncEnabled()){ SYNC_STATUS="saving"; render(); cloudPushNow(); }
     else { SYNC_STATUS="off"; render(); }
   });
   var spull=document.getElementById("syncPull");
   if(spull) spull.addEventListener("click",function(){
+    SYNC.projectId=document.getElementById("syncProj").value.trim();
     SYNC.apiKey=document.getElementById("syncKey").value.trim();
-    SYNC.binId=document.getElementById("syncBin").value.trim();
     saveSyncCfg(SYNC);
-    if(!syncEnabled()){ alert("Bitte zuerst API-Key und Bin-ID eintragen."); return; }
+    if(!syncEnabled()){ alert("Bitte zuerst Projekt-ID und Web-API-Key eintragen."); return; }
     cloudLoad(function(rec){
       if(rec){ applyData(rec); saveLocal(); alert("Daten aus der Cloud geladen."); render(); }
-      else { alert("Konnte nicht laden (Key/Bin prüfen oder Bin noch leer)."); render(); }
+      else { alert("Noch keine Daten in der Cloud (oder Projekt-ID/Key prüfen). Beim ersten Speichern werden deine aktuellen Daten hochgeladen."); render(); }
     });
   });
   var soff=document.getElementById("syncOff");
-  if(soff) soff.addEventListener("click",function(){ SYNC={apiKey:"",binId:""}; saveSyncCfg(SYNC); SYNC_STATUS="off"; render(); });
+  if(soff) soff.addEventListener("click",function(){ SYNC={projectId:"",apiKey:""}; saveSyncCfg(SYNC); SYNC_STATUS="off"; render(); });
 }
 
 /* ====================== START ====================== */
